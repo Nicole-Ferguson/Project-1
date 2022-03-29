@@ -631,6 +631,7 @@ for(i in 1:length(PCs)){
   PC_LAI<-data.frame(i,understory.lai,mid.lai,canopy.lai,high.canopy.lai)
   All_HH_LAI<-rbind(All_HH_LAI,PC_LAI) 
   }
+All_HH_LAI$Total<-rowSums[2:5]
 
 #sort LAI by location
 # Filter point counts per zone
@@ -722,10 +723,32 @@ All_HH_richness<-rbind(Irlanda_richness,Hamburgo_richness,Forest_richness)
 
 boxplot(Richness~Area,data=All_HH_richness)
 
+#adding richness from audiomoth data
+species2<-data.frame()
+for (i in 1:length(unique(audiomoth_detections_filtered_irlanda$point_count))){
+  x<-length(unique(audiomoth_detections_filtered_irlanda$Scientific.name))
+  y<-audiomoth_detections_filtered_irlanda$point_count
+  species<-data.frame(y,x)
+  species2<-rbind(species2,species)
+}
 
 
 
 #combine richness, canopy cover, height in a table, then do relationship..?
+max_frame<-data.frame(1:26,max_vector)#assuming the max values are in order
+mean_frame<-data.frame(1:  ,Height_vector)
+cc_handheld2<-data.frame(1:  .,cc_handheld)
+Total_LAI<-data.frame(1:   ,All_HH_LAI$Total)
+richness<-All_HH_richness$Richness[1:26]
+
+richness_vegindex<-data.frame(max_frame,mean_frame,cc_handheld,Total_LAI,richness)
+names(richness_vegindex)<-c("point_count","max_canopy_height","mean_canopy_height","canopy_cover","total_LAI","richness")
+plot(richness~canopy_height, data=richness_maxheight)
+
+ggplot(richness_maxheight,aes(x=richness,y=canopy_height))+
+  geom_line()#absolutely no correlation
+
+
 
 
 
@@ -763,13 +786,6 @@ Forest_Simpson
 
 #draw plot of all diversity indices against area
 #make table of all indices
-Shannon<-c(Irlanda_Shannon,Hamburgo_Shannon)
-Simpson<-c(Irlanda_Simpson,Hamburgo_Simpson)
-ESN<-c(ESN_Irlanda,ESN_Hamburgo)
-Area<-c("Irlanda","Hamburgo")
-
-
-
 install.packages("fmsb")
 library(fmsb)
 #prepare data
@@ -789,11 +805,11 @@ Diversity_indices <- data.frame(
   Richness = overall_richness$richness_by_effort,
   Shannon_index = c(Irlanda_Shannon, Hamburgo_Shannon, Forest_Shannon),
   Simpson_index = c(Irlanda_Simpson, Hamburgo_Simpson, Forest_Simpson),
-  Effective_species_number = c(ESN_Irlanda, ESN_Hamburgo, ESN_Forest))
+  ESN = c(ESN_Irlanda, ESN_Hamburgo, ESN_Forest))
 
 # Define the variable ranges: maximum and minimum
 max_min <- data.frame(
-  Richness=c(10,0), Shannon_index = c(3.7, 0), Simpson_index = c(3, 0), Effective_species_number = c(30, 0)
+  Richness=c(5,0), Shannon_index = c(3.7, 0), Simpson_index = c(1, 0), Effective_species_number = c(30, 0)
 )
 rownames(max_min) <- c("Max", "Min")
 
@@ -812,7 +828,7 @@ radarchart(Irlanda_data, axistype = 1,color = "#00AFBB",
            axislabcol = "grey",
            )
 #chart for all areas
-radarchart(df, axistype = 1,color = c("#00AFBB","#E7B800", "#FC4E07"), 
+radarchart(df, axistype = 2,color = c("#00AFBB","#E7B800", "#FC4E07"), 
            vlabels = colnames(data), vlcex = 1,
            caxislabels = NULL, title = NULL,
            # Customize the polygon

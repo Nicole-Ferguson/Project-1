@@ -50,7 +50,7 @@ Forest_polygon<-chull(ForestCoords2)
 
 #Drawing Forest polygon
 coord5 <- data.frame(name = "Point 5", x = 	
-                     -92.33737, y = 15.16781)
+                       -92.33737, y = 15.16781)
 point5 <- st_as_sf(coord5, coords = c("x", "y"), crs = 4326)
 
 coord6 <- data.frame(name = "Point 6", x = 	
@@ -69,7 +69,7 @@ pts<-rbind(pts,point2)
 Forestpolygon_final <- st_sfc(st_polygon(list(st_coordinates(rbind(pts, point5)))), crs = 4326)
 
 # Get elevation data
-srtm <- terra::rast("C:/Users/User/Documents/Masters/Project 1/Gedi analysis/resources/elevation/N15W093.hgt")
+srtm <- terra::rast("Resources/elevation/N15W093.hgt")
 
 pointCounts <- pointCounts[pointCounts$?..Point_count <= 45,]
 pointCounts_sf <- st_as_sf(pointCounts, coords = c("Lon", "Lat"), crs = crs(srtm))
@@ -205,8 +205,8 @@ toremove<-which(Canopy_h_Hamburgo==0)
 Canopy_h_Hamburgo<-Canopy_h_Hamburgo[-toremove]
 Canopy_h_Hamburgo<-Canopy_h_Hamburgo/100
 
-Forest_metrics<-gedi_irlanda2[Forest_gedi[[1]], ]
-Canopy_h_Forest<-Forest_metrics$rh100
+#Forest_metrics<-gedi_irlanda2[Forest_gedi[[1]], ]
+#Canopy_h_Forest<-Forest_metrics$rh100
 
 
 mean(Canopy_h_Irlanda)
@@ -223,7 +223,7 @@ names(Hamburgo_height)<-c("Area","Canopy_height")
 Forest_height<-data.frame("Forest",Canopy_h_Forest)
 names(Forest_height)<-c("Area","Canopy_height")
 
-Canopy_h_table<-rbind(Irlanda_height,Hamburgo_height,Forest_height)
+Canopy_h_table<-rbind(Irlanda_height,Hamburgo_height)
 
 
 boxplot(Canopy_height~Area,data=Canopy_h_table)
@@ -259,67 +259,16 @@ names(Irlanda_cover)<-c("Area","Canopy_cover")
 Hamburgo_cover<-data.frame("Hamburgo",Canopy_cov_Hamburgo)
 names(Hamburgo_cover)<-c("Area","Canopy_cover")
 
-Forest_cover<-data.frame("Forest",Canopy_cov_Forest)
-names(Forest_cover)<-c("Area","Canopy_cover")
+#Forest_cover<-data.frame("Forest",Canopy_cov_Forest)
+#names(Forest_cover)<-c("Area","Canopy_cover")
 
 
-Canopy_cov_table<-rbind(Irlanda_cover,Hamburgo_cover,Forest_cover)
-     
-     
+Canopy_cov_table<-rbind(Irlanda_cover,Hamburgo_cover)
+
+
 boxplot(Canopy_cover~Area,data=Canopy_cov_table)
 
 #Get structural diversity of GEDI points for each location
-
-
-#creating PAVD Profile data for the whole area
-
-#gedilevel2b <- readLevel2B(level2Bpath = paste0("resources/lidar/", list.files("resources/lidar/"))[1])
-#level2BPAVD<-getLevel2BPAVDProfile(gedilevel2b)
-
-#level2BPAVD$shot_number<-paste0(level2BPAVD$shot_number)
-#toremove <- which(is.na(level2BPAVD$longitude_bin0) == T)
-#if(length(toremove > 0)){
- # level2BPAVD <- level2BPAVD[-toremove,]
-}
-#level2BPAVD_spdf<-SpatialPointsDataFrame(cbind(level2BPAVD$lon_lowestmode,level2BPAVD$lat_lowestmode),data=level2BPAVD)
-#all_PAVD<- level2BPAVD_spdf[which(level2BPAVD_spdf$lat_lowestmode > 15.15 & level2BPAVD_spdf$lat_lowestmode < 15.19 & level2BPAVD_spdf$lon_lowestmode >= -92.36 & level2BPAVD_spdf$lon_lowestmode <= -92.32),]
-
-#for(i in 2:length(list.files("resources/lidar/"))){
-  #gedilevel2b <- readLevel2B(level2Bpath = paste0("resources/lidar/", list.files("resources/lidar/"))[i])
-  #level2BPAVD<-getLevel2BPAVDProfile(gedilevel2b)
-  #level2BPAVD$shot_number<-paste0(level2BPAVD$shot_number)
-  #toremove <- which(is.na(level2BPAVD$lon_lowestmode) == T)
-  #if(length(toremove > 0)){
-  #  level2BPAVD <- level2BPAVD[-toremove,]
-  #}
- # level2BPAVD_spdf<-SpatialPointsDataFrame(cbind(level2BPAVD$lon_lowestmode,level2BPAVD$lat_lowestmode),data=level2BPAVD)
-#  all_PAVD<- rbind(all_PAVD, level2BPAVD_spdf[which(level2BPAVD_spdf$lat_lowestmode > 15.15 & level2BPAVD_spdf$lat_lowestmode< 15.19 & level2BPAVD_spdf$lon_lowestmode >= -92.36 & level2BPAVD_spdf$lon_lowestmode <= -92.32),])
-#}
-#all_PAVD2<-as.data.frame(all_PAVD)
-#getting PAVD values for each area
-
-#all_PAVD3<-all_PAVD2[,12:41]
-#Gedi_layers_Irlanda<-all_PAVD3[Irlanda_gedi[[1]], ]
-#toremove<-which(is.na(Gedi_layers_Irlanda$pavd_z0_5m)|Gedi_layers_Irlanda$pavd_z0_5m==-9.999000e+03)
-#Gedi_layers_Irlanda<-Gedi_layers_Irlanda[-toremove,]
-
-#Gedi_layers_Hamburgo<-all_PAVD3[Hamburgo_gedi[[1]], ]
-#toremove<-which(is.na(Gedi_layers_Hamburgo$pavd_z0_5m))
-#Gedi_layers_Hamburgo<-Gedi_layers_Hamburgo[-toremove,]
-
-#Gedi_layers_Forest<-all_PAVD3[Forest_gedi[[1]], ]
-#toremove<-which(is.na(Gedi_layers_Forest$pavd_z0_5m))
-#Gedi_layers_Forest<-Gedi_layers_Forest[-toremove,]
-
-#mean(Gedi_layers_Irlanda$pavd_z0_5m)
-#mean(Gedi_layers_Hamburgo$pavd_z0_5m)
-#mean(Gedi_layers_Forest$pavd_z0_5m)
-
-
-#mean(Gedi_layers_Irlanda$pavd_z5_10m)
-#mean(Gedi_layers_Hamburgo$pavd_z5_10m)
-#mean(Gedi_layers_Forest$pavd_z5_10m)
-
 
 
 #Getting PAI data
@@ -467,7 +416,7 @@ theme_set(theme_classic())
 gg <- ggplot(df, aes(x=Canopy_cover, y=Canopy_height)) + 
   geom_point(aes(col=Area)) +
   labs(title="Canopy height vs Canopy cover", 
-      y="Canopy height (m)", 
+       y="Canopy height (m)", 
        x="Canopy cover (%)",
        caption="Source:GEDI data")
 # main title
@@ -529,10 +478,10 @@ point_density<-Point_nr/duration
 
 #create loop which will extract point_density for all point count lidar scans
 #for(i in 2:length(list.files("PCs"))){
- # Handheld_lidar <- readLAS(paste0("PCs", list.files("PCs"))[i]) 
-  #Points<-dim(Handheld_lidar@data)
-  #Point_nr<-Points[[1]]
-  #all_PCs_point_nr<-rbind(all_PCs_point_nr,Points)}
+# Handheld_lidar <- readLAS(paste0("PCs", list.files("PCs"))[i]) 
+#Points<-dim(Handheld_lidar@data)
+#Point_nr<-Points[[1]]
+#all_PCs_point_nr<-rbind(all_PCs_point_nr,Points)}
 
 #Canopy height from Handheld lidar
 
@@ -543,10 +492,12 @@ mean(Z_top)# only 6m?
 highest<-max(Point_Count_1_NORM$Z)
 
 #automate for every point count
-
-Point_count<-PCs[2] #nr two i s nr 10!!!
-
 PCs <- list.files("Resources/PCs")
+Point_count<-PCs[1] #nr two is nr 10
+library(gtools)
+PCs<- mixedsort(PCs)
+
+
 Height_vector <- vector()
 for(i in 1:length(PCs)){
   Point_count<-readLAS(paste0("Resources/PCs/",PCs[i]))
@@ -563,7 +514,7 @@ for(i in 1:length(PCs)){
   highest<-max(Z)
   max_vector<-c(max_vector,highest)
 }
-  
+
 #Get height for each area
 Irlanda_height<-Height_vector[PC_irlanda]
 Hamburgo_height<-Height_vector[PC_hamburgo]
@@ -573,12 +524,12 @@ Irlanda_max<-max_vector[PC_irlanda]
 Hamburgo_max<-max_vector[PC_hamburgo]
 Forest_max<-max_vector[PC_forest]
 
-mean(Irlanda_height)
-mean(Hamburgo_height)
+mean(Irlanda_height,na.rm=TRUE)
+mean(Hamburgo_height,na.rm=TRUE)
 mean(Forest_height)
 
-mean(Irlanda_max)
-mean(Hamburgo_max)
+mean(Irlanda_max,na.rm=TRUE)
+mean(Hamburgo_max,na.rm=TRUE)
 mean(Forest_max)
 
 #Canopy cover from handheld lidar
@@ -598,15 +549,15 @@ cc_hh_Irlanda<-cc_handheld[PC_irlanda]
 cc_hh_Hamburgo<-cc_handheld[PC_hamburgo]
 cc_hh_Forest<-cc_handheld[PC_forest]
 
-mean(cc_hh_Irlanda)
-mean(cc_hh_Hamburgo)
+mean(cc_hh_Irlanda,na.rm=TRUE)
+mean(cc_hh_Hamburgo,na.rm=TRUE)
 mean(cc_hh_Forest)
 
 
 #PAI from handheld
 
 VOXELS_LAD <- lad.voxels("Resources/PCs/PC1_heightNorm.las",
-                        grain.size = 1)
+                         grain.size = 1)
 
 lad_profile <- lad.profile(VOXELS_LAD)
 
@@ -618,7 +569,6 @@ high.canopy.lai<-lai(lad_profile,min=20,max=150);high.canopy.lai
 PC1_LAI<-data.frame("1",understory.lai,mid.lai,canopy.lai,high.canopy.lai)
 
 #automate for every point count
-PCs <- list.files("Resources/PCs")
 All_HH_LAI<-vector()
 for(i in 1:length(PCs)){
   VOXELS_LAD <- lad.voxels(paste0("Resources/PCs/",PCs[i]), grain.size=1)
@@ -630,27 +580,74 @@ for(i in 1:length(PCs)){
   high.canopy.lai<-lai(lad_profile,min=20,max=150);high.canopy.lai
   PC_LAI<-data.frame(i,understory.lai,mid.lai,canopy.lai,high.canopy.lai)
   All_HH_LAI<-rbind(All_HH_LAI,PC_LAI) 
-  }
-All_HH_LAI$Total<-rowSums[2:5]
+}
+All_HH_LAI$Total<-rowSums(All_HH_LAI[,2:5])
 
 #sort LAI by location
 # Filter point counts per zone
-Irlanda_LAI<-All_HH_LAI[PC_irlanda,]
-Hamburgo_LAI<-All_HH_LAI[PC_hamburgo,]
-Forest_LAI<-All_HH_LAI[PC_forest,]
-  
+Irlanda_LAI<-data.frame("Irlanda",All_HH_LAI[PC_irlanda,])
+#Irlanda_LAI<-Irlanda_LAI[-23,]
+names(Irlanda_LAI)<-c("Area","i","understory.lai","mid.lai","canopy.lai","high.canopy.lai","total.lai")
+Hamburgo_LAI<-data.frame("Hamburgo",All_HH_LAI[PC_hamburgo,])
+Hamburgo_LAI<-Hamburgo_LAI[-12,]
+names(Hamburgo_LAI)<-c("Area","i","understory.lai","mid.lai","canopy.lai","high.canopy.lai","total.lai")
+Forest_LAI<-data.frame("Forest",All_HH_LAI[PC_forest,])
+names(Forest_LAI)<-c("Area","i","understory.lai","mid.lai","canopy.lai","high.canopy.lai","total.lai")
+
+#Reorder Lai to draw graph
+Irlanda_LAI<-Irlanda_LAI[,-2]
+total<-data.frame("Irlanda",Irlanda_LAI$total.lai,"Total")
+names(total)<-c("Area","PAI","Type")
+hc<-data.frame("Irlanda",Irlanda_LAI$high.canopy.lai,"High_canopy")
+names(hc)<-c("Area","PAI","Type")
+c<-data.frame("Irlanda",Irlanda_LAI$canopy.lai,"Canopy")
+names(c)<-c("Area","PAI","Type")
+m<-data.frame("Irlanda",Irlanda_LAI$mid.lai,"Mid")
+names(m)<-c("Area","PAI","Type")
+u<-data.frame("Irlanda",Irlanda_LAI$understory.lai,"Understory")
+names(u)<-c("Area","PAI","Type")
+Irlanda_LAI<-rbind(u,m,c,hc,total)
+
+
+Hamburgo_LAI<-Hamburgo_LAI[,-2]
+total<-data.frame("Hamburgo",Hamburgo_LAI$total.lai,"Total")
+names(total)<-c("Area","PAI","Type")
+hc<-data.frame("Hamburgo",Hamburgo_LAI$high.canopy.lai,"High_canopy")
+names(hc)<-c("Area","PAI","Type")
+c<-data.frame("Hamburgo",Hamburgo_LAI$canopy.lai,"Canopy")
+names(c)<-c("Area","PAI","Type")
+m<-data.frame("Hamburgo",Hamburgo_LAI$mid.lai,"Mid")
+names(m)<-c("Area","PAI","Type")
+u<-data.frame("Hamburgo",Hamburgo_LAI$understory.lai,"Understory")
+names(u)<-c("Area","PAI","Type")
+Hamburgo_LAI<-rbind(u,m,c,hc,total)
+
+
+Forest_LAI<-Forest_LAI[,-2]
+total<-data.frame("Forest",Forest_LAI$total.lai,"Total")
+names(total)<-c("Area","PAI","Type")
+hc<-data.frame("Forest",Forest_LAI$high.canopy.lai,"High_canopy")
+names(hc)<-c("Area","PAI","Type")
+c<-data.frame("Forest",Forest_LAI$canopy.lai,"Canopy")
+names(c)<-c("Area","PAI","Type")
+m<-data.frame("Forest",Forest_LAI$mid.lai,"Mid")
+names(m)<-c("Area","PAI","Type")
+u<-data.frame("Forest",Forest_LAI$understory.lai,"Understory")
+names(u)<-c("Area","PAI","Type")
+Forest_LAI<-rbind(u,m,c,hc,total)
+
 #draw boxplot of HH LAI
-ALl_LAI<-rbind(Irlanda_LAI,Hamburgo_LAI,Forest_LAI)
-All_LAI$total<-rowsum(All_LAI)
-names(ALl_LAI)<-
-library(ggthemes)
+All_LAI<-rbind(Irlanda_LAI,Hamburgo_LAI,Forest_LAI)
+
+  library(ggthemes)
 g <- ggplot(All_LAI, aes(x=reorder(Type,-PAI),y=PAI,fill=Area,col=Area))+
   geom_boxplot() +
   labs(title="PAI vs canopy height",
        caption="Source: HAndheld lidar data",
        x="Canopy height",
-       y=bquote('PAI'~[m^2/m^2]))+
+       y=bquote('PAI'~(m^2/m^2)))+
   coord_flip()
+
 g + theme(plot.title = element_text(face="bold",size=16))
 plot(g)
 
@@ -682,9 +679,9 @@ pointCounts_forest <- pointCounts_forest[which(pointCounts_forest$Confidence >= 
 pointCounts_hamburgo <- pointCounts_hamburgo[which(pointCounts_hamburgo$Confidence >= conf_threshold),]
 
 #nr of point counts per zone after confidence filtering(above)
-PC_irlanda <- unique(pointCounts_irlanda$ï..Point_count)
-PC_forest <- unique(pointCounts_forest$ï..Point_count)
-PC_hamburgo <- unique(pointCounts_hamburgo$ï..Point_count)
+PC_irlanda <- unique(pointCounts_irlanda$?..Point_count)
+PC_forest <- unique(pointCounts_forest$?..Point_count)
+PC_hamburgo <- unique(pointCounts_hamburgo$?..Point_count)
 
 # Species per zone
 species_irlanda <- unique(pointCounts_irlanda$Species)
@@ -724,15 +721,160 @@ All_HH_richness<-rbind(Irlanda_richness,Hamburgo_richness,Forest_richness)
 boxplot(Richness~Area,data=All_HH_richness)
 
 #adding richness from audiomoth data
-species2<-data.frame()
-for (i in 1:length(unique(audiomoth_detections_filtered_irlanda$point_count))){
-  x<-length(unique(audiomoth_detections_filtered_irlanda$Scientific.name))
-  y<-audiomoth_detections_filtered_irlanda$point_count
-  species<-data.frame(y,x)
-  species2<-rbind(species2,species)
+PCs <- list.files("Resources/audiomoths")
+PCs<- mixedsort(PCs)
+audiomoth_detections <- vector()
+for(i in 1:length(PCs)){
+  PC_path <- paste0("Resources/audiomoths/", PCs[i])
+  audiomoth_det <- vector()
+  for(j in 1:length(list.files(PC_path))){
+    f = read.csv(paste(PC_path, list.files(PC_path)[j], sep="/"), sep=";")
+    audiomoth_det <- rbind(audiomoth_det, f)
+  }
+  audiomoth_det <- cbind(rep(as.numeric(substr(PCs[i], 3, nchar(PCs[i]))), dim(audiomoth_det)[1]), audiomoth_det)
+  audiomoth_detections <- rbind(audiomoth_detections, audiomoth_det)
 }
+colnames(audiomoth_detections)[1] <- "point_count"
+
+write.csv(audiomoth_detections, "results/audiomoth_detections.csv")
 
 
+# Filter the results of BirdNET detection above a threshold for the confidence value
+
+confidence_threshold = 0.75
+audiomoth_detections_filtered <- audiomoth_detections[which(audiomoth_detections$Confidence >= confidence_threshold),]
+
+
+## Filter detections per zone
+#audiomoth_detections_filtered_irlanda <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count %in% PC_irlanda,]
+#audiomoth_detections_filtered_forest <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count %in% PC_forest,]
+#audiomoth_detections_filtered_hamburgo <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count %in% PC_hamburgo,]
+
+# Filter the results of BirdNET detection above a threshold for the confidence value
+
+confidence_threshold = 0.75
+audiomoth_detections_filtered <- audiomoth_detections[which(audiomoth_detections$Confidence >= confidence_threshold),]
+
+#Filter detections per point count
+audiomoth_detections_filtered_1 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==1,]
+unique(audiomoth_detections_filtered_1$Common.name)
+
+audiomoth_detections_filtered_2 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==2,]
+unique(audiomoth_detections_filtered_2$Common.name)
+
+audiomoth_detections_filtered_3 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==3,]
+unique(audiomoth_detections_filtered_3$Common.name)
+
+audiomoth_detections_filtered_4 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==4,]
+unique(audiomoth_detections_filtered_4$Common.name)
+
+audiomoth_detections_filtered_5 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==5,]
+unique(audiomoth_detections_filtered_5$Common.name)
+
+audiomoth_detections_filtered_6 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==6,]
+unique(audiomoth_detections_filtered_6$Common.name)
+
+audiomoth_detections_filtered_7 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==7,]
+unique(audiomoth_detections_filtered_7$Common.name)
+
+audiomoth_detections_filtered_8 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==8,]
+unique(audiomoth_detections_filtered_8$Common.name)
+
+audiomoth_detections_filtered_9 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==9,]
+unique(audiomoth_detections_filtered_9$Common.name)
+
+audiomoth_detections_filtered_10 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==10,]
+unique(audiomoth_detections_filtered_10$Common.name)
+
+audiomoth_detections_filtered_11 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==11,]
+unique(audiomoth_detections_filtered_11$Common.name)
+
+audiomoth_detections_filtered_12 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==12,]
+unique(audiomoth_detections_filtered_12$Common.name)
+
+audiomoth_detections_filtered_13 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==13,]
+unique(audiomoth_detections_filtered_13$Common.name)
+
+audiomoth_detections_filtered_14 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==14,]
+unique(audiomoth_detections_filtered_14$Common.name)
+
+audiomoth_detections_filtered_15 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==15,]
+unique(audiomoth_detections_filtered_15$Common.name)
+
+audiomoth_detections_filtered_16 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==16,]
+unique(audiomoth_detections_filtered_16$Common.name)
+
+audiomoth_detections_filtered_17 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==17,]
+unique(audiomoth_detections_filtered_17$Common.name)
+
+audiomoth_detections_filtered_18 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==18,]
+unique(audiomoth_detections_filtered_18$Common.name)
+
+audiomoth_detections_filtered_27 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==27,]
+unique(audiomoth_detections_filtered_27$Common.name)
+
+audiomoth_detections_filtered_28 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==28,]
+unique(audiomoth_detections_filtered_28$Common.name)
+
+audiomoth_detections_filtered_29 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==29,]
+unique(audiomoth_detections_filtered_29$Common.name)
+
+audiomoth_detections_filtered_30 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==30,]
+unique(audiomoth_detections_filtered_30$Common.name)
+
+audiomoth_detections_filtered_31 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==31,]
+unique(audiomoth_detections_filtered_31$Common.name)
+
+audiomoth_detections_filtered_32 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==32,]
+unique(audiomoth_detections_filtered_32$Common.name)
+
+audiomoth_detections_filtered_33 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==33,]
+unique(audiomoth_detections_filtered_33$Common.name)
+
+audiomoth_detections_filtered_34 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==34,]
+unique(audiomoth_detections_filtered_34$Common.name)
+
+audiomoth_detections_filtered_35 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==35,]
+unique(audiomoth_detections_filtered_35$Common.name)
+
+audiomoth_detections_filtered_36 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==36,]
+unique(audiomoth_detections_filtered_36$Common.name)
+
+audiomoth_detections_filtered_38 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==38,]
+unique(audiomoth_detections_filtered_38$Common.name)
+
+audiomoth_detections_filtered_40 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==40,]
+unique(audiomoth_detections_filtered_40$Common.name)
+
+audiomoth_detections_filtered_41 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==41,]
+unique(audiomoth_detections_filtered_41$Common.name)
+
+audiomoth_detections_filtered_42 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==42,]
+unique(audiomoth_detections_filtered_42$Common.name)
+
+audiomoth_detections_filtered_43 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==43,]
+unique(audiomoth_detections_filtered_43$Common.name)
+
+audiomoth_detections_filtered_45 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==45,]
+unique(audiomoth_detections_filtered_45$Common.name)
+
+audiomoth_detections_filtered_19 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==19,]
+unique(audiomoth_detections_filtered_19$Common.name)
+
+audiomoth_detections_filtered_20 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==20,]
+unique(audiomoth_detections_filtered_20$Common.name)
+
+audiomoth_detections_filtered_21 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==21,]
+unique(audiomoth_detections_filtered_21$Common.name)
+
+audiomoth_detections_filtered_22 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==22,]
+unique(audiomoth_detections_filtered_22$Common.name)
+
+audiomoth_detections_filtered_23 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==23,]
+unique(audiomoth_detections_filtered_23$Common.name)
+
+audiomoth_detections_filtered_24 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==24,]
+unique(audiomoth_detections_filtered_24$Common.name)
 
 #combine richness, canopy cover, height in a table, then do relationship..?
 max_frame<-data.frame(1:26,max_vector)#assuming the max values are in order
@@ -826,7 +968,7 @@ radarchart(Irlanda_data, axistype = 1,color = "#00AFBB",
            cglcol = "grey", cglty = 1, cglwd = 0.8,
            # Customize the axis
            axislabcol = "grey",
-           )
+)
 #chart for all areas
 radarchart(df, axistype = 2,color = c("#00AFBB","#E7B800", "#FC4E07"), 
            vlabels = colnames(data), vlcex = 1,
@@ -843,10 +985,33 @@ legend(
   bty = "n", pch = 20 , col = c("green", "red", "blue"),
   text.col = "black", cex = 1, pt.cex = 1.5)
 
+#Beta diversity and Jaccard index
 
+install.packages("betapart")
+install.packages("vegan")
+library(betapart)
+library(vegan)
+All_HH_richness$overall_richness
+#need table of species in each point count and their presence/absence
+Forest_presab<-read.csv("Resources/Forest_presab.csv")
+Hamburgo_presab<-read.csv("Resources/Hamburgo_presab.csv")
+Irlanda_presab<-read.csv("Resources/Irlanda_presab.csv")
+All_presab<-read.csv("Resources/All_presab.csv")
+row_labels<-All_presab$Row.Labels
+All_presab<-All_presab[,-1]
+# merge two data frames by ID
 
+#groups <- factor(c(, rep(2,3)), rep(),labels = c("Irlanda","Hamburgo","Forest"))
 
+Irlanda<-PC_irlanda
+Hamburgo<-PC_hamburgo
+Forest<-PC_forest
 
+All_presab2<-All_presab %>%
+  mutate(All_presab$Row.Labels<-case_when(Row.Labels %in% Irlanda ~ "Irlanda",Row.Labels %in% Hamburgo ~ "Hamburgo",Row.Labels %in% Forest ~ "Forest",TRUE ~ "other")) %>%
+  mutate(All_presab$Row.Labels<-All_presab$Row.Labels %>% as.factor())
+
+dist<-beta.pair(All_presab, index.family="jaccard")
 
 
 
@@ -887,10 +1052,10 @@ all.cover<-data.frame(c,Canopy_cov_table)
 
 #cov <- ggplot(all.cover, aes(x=Type,y=PAI,fill=Area,col=Area))+
 #  geom_boxplot() +
- # theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
+# theme(axis.text.x = element_text(angle=65, vjust=0.6)) + 
 #  labs(title="Box plot", 
- #      subtitle="PAI to canopy height",
+#      subtitle="PAI to canopy height",
 #       caption="Source: GEDI data",
- #      x="Canopy height",
-  #     y="PAI")
+#      x="Canopy height",
+#     y="PAI")
 #plot(cov)

@@ -169,12 +169,30 @@ summary(a_hh4)
 #GEDI height vs max_height
 
 #Irlanda
-Canopy_h_Irlanda vs Irlanda_max#Canopy_h_Irlanda has too many points:remove two last ones
+#laast Irlanda_max is NA
+Irlanda_max<-Irlanda_max[-23]
+#Canopy_h_Irlanda has too many points:remove two last ones
 Canopy_h_Irlanda2<-Canopy_h_Irlanda[-(23:24)]
+
 
 h1<-data.frame(Canopy_h_Irlanda2,Irlanda_max)
 gh1<-aov(h1$Canopy_h_Irlanda2~h1$Irlanda_max)
 summary(gh1)
+#normal distributiion of residuals
+qqnorm(residuals(gh1))
+qqline(residuals(gh1))
+hist(residuals(gh1))
+
+#equality of variance
+boxplot(h1$Canopy_h_Irlanda2~h1$Irlanda_max)
+boxplot(residuals(gh1)~h1$Irlanda_max)
+
+#assumptions broken
+h1_log<-data.frame(log(Canopy_h_Irlanda2),Irlanda_max)
+gh1<-aov(h1_log$log.Canopy_h_Irlanda2.~h1_log$Irlanda_max)
+summary(gh1)
+
+
 
 #Hamburgo
 #Hamburgo_max has too many values - remove 2
@@ -183,15 +201,36 @@ Hamburgo_max2<-Hamburgo_max[-(11:12)]
 h2<-data.frame(Canopy_h_Hamburgo,Hamburgo_max2)
 gh2<-aov(h2$Canopy_h_Hamburgo~h2$Hamburgo_max)
 summary(gh2)
+#normal distributiion of residuals
+qqnorm(residuals(gh2))
+qqline(residuals(gh2))
+hist(residuals(gh2))
+
+#equality of variance
+boxplot(h2$Canopy_h_Hamburgo~h2$Hamburgo_max)
+boxplot(residuals(gh2)~h2$Hamburgo_max)#residuals and all dont make sense 
+
 
 #GEDI height vs mean height
 
 #Irlanda
+Irlanda_height<-Irlanda_height[-23]
 Canopy_h_Irlanda2<-Canopy_h_Irlanda[-(23:24)]
 
 h3<-data.frame(Canopy_h_Irlanda2,Irlanda_height)
 gh3<-aov(h3$Canopy_h_Irlanda2~h3$Irlanda_height)
 summary(gh3)
+
+#normal distributiion of residuals
+qqnorm(residuals(gh3))
+qqline(residuals(gh3))
+hist(residuals(gh3))
+
+#equality of variance
+boxplot(h3$Canopy_h_Irlanda2~h3$Irlanda_height)
+boxplot(residuals(gh3)~h3$Irlanda_height)
+
+
 
 #Hamburgo
 Hamburgo_height2<-Hamburgo_height[-(11:12)]
@@ -199,6 +238,18 @@ Hamburgo_height2<-Hamburgo_height[-(11:12)]
 h4<-data.frame(Canopy_h_Hamburgo,Hamburgo_height2)
 gh4<-aov(h4$Canopy_h_Hamburgo~h4$Hamburgo_height)
 summary(gh4)
+
+#normal distributiion of residuals
+qqnorm(residuals(gh4))
+qqline(residuals(gh4))
+hist(residuals(gh4))
+
+#equality of variance
+boxplot(h4$Canopy_h_Hamburgo~h4$Hamburgo_height)
+boxplot(residuals(gh4)~h4$Hamburgo_height)
+
+
+
 
 #GEDI Total PAI vs HH total PAI
 
@@ -211,14 +262,67 @@ p<-data.frame(gedi_tPAI,Irlanda_LAI$Total)
 gh4<-aov(p$gedi_tPAI~p$Irlanda_LAI.Total)
 summary(gh4)
 
+#normal distributiion of residuals
+qqnorm(residuals(gh4))
+qqline(residuals(gh4))
+hist(residuals(gh4))
+
+#equality of variance
+boxplot(p$gedi_tPAI~p$Irlanda_LAI.Total)
+boxplot(residuals(gh4)~p$Irlanda_LAI.Total)
+
+
+
+
+
 #Hamburgo
 length(Gedi_layers_Hamburgo$total)
-length(Hamburgo_LAI$Total)
-gedi_tPAI2<-Gedi_layers_Hamburgo$total[-13]
+length(Hamburgo_LAI$total.lai)
+gedi_tPAI2<-Gedi_layers_Hamburgo$total[-(12:13)]
 
-gh5<-aov(gedi_tPAI2~Hamburgo_LAI$Total)
+gh5<-aov(gedi_tPAI2~Hamburgo_LAI$total.lai)
 summary(gh5)
 
+#normal distributiion of residuals
+qqnorm(residuals(gh5))
+qqline(residuals(gh5))
+hist(residuals(gh5))
+
+#equality of variance
+boxplot(gedi_tPAI2~Hamburgo_LAI$total.lai)
+boxplot(residuals(gh5)~Hamburgo_LAI$total.lai) #values actually more similar
+
+#no normal distribution of residuals
+gh5<-aov(log(gedi_tPAI2)~Hamburgo_LAI$total.lai)
+summary(gh5)
+
+
+#Relative differemce between areas for GEDI vs HH
+mean(Canopy_h_Irlanda)
+
+Ham_h_Gedi_diff<-(mean(Canopy_h_Hamburgo)-mean(Canopy_h_Irlanda))/mean(Canopy_h_Irlanda)
+Ham_hmax_diff<-(mean(Hamburgo_max, na.rm=T)-mean(Irlanda_max))/mean(Irlanda_max)
+Ham_hmean_diff<-(mean(Hamburgo_height, na.rm=T)-mean(Irlanda_height))/mean(Irlanda_height)
+Ham_h_Gedi_diff
+Ham_hmax_diff
+Ham_hmean_diff
+
+
+Ham_cov_Gedi_diff<-(mean(Canopy_cov_Hamburgo)-mean(Canopy_cov_Irlanda))/mean(Canopy_cov_Irlanda)
+Ham_cov_diff<-(mean(cc_hh_Hamburgo, na.rm=T)-mean(cc_hh_Irlanda, na.rm=T))/mean(cc_hh_Irlanda, na.rm=T)
+Ham_cov_Gedi_diff
+Ham_cov_diff
+
+Ham_PAI_Gedi_diff<-(mean(Gedi_layers_Hamburgo$total)-mean(Gedi_layers_Irlanda$total))/mean(Gedi_layers_Irlanda$total)
+Ham_PAI_diff<-(mean(Hamburgo_LAI$total.lai)-mean(Irlanda_LAI$total.lai)/mean(Irlanda_LAI$total.lai))
+
+#relative difference value table
+
+GEDI<-c(Ham_h_Gedi_diff,"NA",Ham_cov_Gedi_diff,Ham_PAI_Gedi_diff)
+Handheld<-c(Ham_hmax_diff,Ham_hmean_diff,Ham_cov_diff,Ham_PAI_diff)
+metrics<-c("Max height","Mean height","Canopy cover", "PAI")
+diff_table<-data.frame(metrics,GEDI,Handheld)
+diff_table
 
 #richness compared
 

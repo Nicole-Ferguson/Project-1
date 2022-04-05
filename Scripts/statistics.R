@@ -73,6 +73,60 @@ a4<-aov(total_PAI$Log_PAI~total_PAI$Area)
 summary(a4)
 
 
+Understory_PAI
+a1.1<-aov(Understory_PAI$Understory_PAI~Understory_PAI$Area)
+summary(a1.1)
+#normal distributiion of residuals
+qqnorm(residuals(a1.1))
+qqline(residuals(a1.1))
+hist(residuals(a1.1))
+
+#equality of variance
+boxplot(Understory_PAI$Understory_PAI~Understory_PAI$Area)
+boxplot(residuals(a1.1)~Understory_PAI$Area)
+
+
+Mid_PAI
+a1.2<-aov(Mid_PAI$Mid_PAI~Mid_PAI$Area)
+summary(a1.2)
+#normal distributiion of residuals
+qqnorm(residuals(a1.2))
+qqline(residuals(a1.2))
+hist(residuals(a1.2))
+
+#equality of variance
+boxplot(Mid_PAI$Mid_PAI~Mid_PAI$Area)
+boxplot(residuals(a1.2)~Mid_PAI$Area)
+
+Canopy_PAI
+a1.3<-aov(Canopy_PAI$Canopy_PAI~Canopy_PAI$Area)
+summary(a1.3)
+#normal distributiion of residuals
+qqnorm(residuals(a1.3))
+qqline(residuals(a1.3))
+hist(residuals(a1.3))
+
+High_canopy_PAI
+a1.4<-aov(High_canopy_PAI$High_canopy_PAI~High_canopy_PAI$Area)
+summary(a1.4)
+#normal distributiion of residuals
+qqnorm(residuals(a1.4))
+qqline(residuals(a1.4))
+hist(residuals(a1.4))
+
+#equality of variance
+boxplot(High_canopy_PAI$High_canopy_PAI~High_canopy_PAI$Area)
+boxplot(residuals(a1.4)~High_canopy_PAI$Area)
+#assumptions broken - log
+total_PAI$Log_PAI<-log(total_PAI$PAI)
+
+#assumptions broken - log
+High_canopy_PAI$Log_PAI<-log(High_canopy_PAI$High_canopy_PAI)
+
+a1.4<-aov(High_canopy_PAI$Log_PAI~High_canopy_PAI$Area)#doesnt work
+summary(a1.4)
+
+
 #P value table
 
 Metric<-c("Canopy height","Canopy cover","FHD","Total PAI")
@@ -161,6 +215,86 @@ Total_LAI<-All_LAI[which(All_LAI$Type=="Total"),]
 
 a_hh4<-aov(Total_LAI$PAI~Total_LAI$Area)
 summary(a_hh4)
+
+#normal distributiion of residuals
+qqnorm(residuals(a_hh4))
+qqline(residuals(a_hh4))
+hist(residuals(a_hh4))
+
+#equality of variance
+boxplot(Total_LAI$PAI~Total_LAI$Area)
+boxplot(residuals(a_hh4)~Total_LAI$Area)
+
+
+Understory_LAI<-All_LAI[which(All_LAI$Type=="understory (0-5)"),]
+
+a_hh5<-aov(Understory_LAI$PAI~Understory_LAI$Area)
+summary(a_hh5)
+
+#normal distributiion of residuals
+qqnorm(residuals(a_hh5))
+qqline(residuals(a_hh5))
+hist(residuals(a_hh5))
+
+#equality of variance
+boxplot(Understory_LAI$PAI~Understory_LAI$Area)
+boxplot(residuals(a_hh5)~Understory_LAI$Area)
+
+
+Mid_LAI<-All_LAI[which(All_LAI$Type=="mid height (5-10)"),]
+
+a_hh6<-aov(Mid_LAI$PAI~Mid_LAI$Area)
+summary(a_hh6)
+
+#normal distributiion of residuals
+qqnorm(residuals(a_hh6))
+qqline(residuals(a_hh6))
+hist(residuals(a_hh6))
+
+#equality of variance
+boxplot(Mid_LAI$PAI~Mid_LAI$Area)
+boxplot(residuals(a_hh6)~Mid_LAI$Area)
+
+
+Canopy_LAI<-All_LAI[which(All_LAI$Type=="canopy (10-20)"),]
+
+a_hh7<-aov(Canopy_LAI$PAI~Canopy_LAI$Area)
+summary(a_hh7)
+
+#normal distributiion of residuals
+qqnorm(residuals(a_hh7))
+qqline(residuals(a_hh7))
+hist(residuals(a_hh7))
+
+#equality of variance
+boxplot(Canopy_LAI$PAI~Canopy_LAI$Area)
+boxplot(residuals(a_hh7)~Canopy_LAI$Area)
+
+Canopy_LAI$Log<-log(Mid_LAI$PAI)
+
+a_hh7<-aov(Canopy_LAI$Log~Canopy_LAI$Area)
+summary(a_hh7)
+
+
+High_canopy_LAI<-All_LAI[which(All_LAI$Type=="high canopy (20+)"),]
+
+a_hh8<-aov(High_canopy_LAI$PAI~High_canopy_LAI$Area)
+summary(a_hh8)
+
+#normal distributiion of residuals
+qqnorm(residuals(a_hh8))
+qqline(residuals(a_hh8))
+hist(residuals(a_hh8))
+
+#equality of variance
+boxplot(High_canopy_LAI$PAI~High_canopy_LAI$Area)
+boxplot(residuals(a_hh8)~High_canopy_LAI$Area)
+
+#assumptions broken
+High_canopy_LAI$Log<-log(High_canopy_LAI$PAI)
+
+a_hh8<-aov(High_canopy_LAI$Log~High_canopy_LAI$Area)#doesnt work
+summary(a_hh8)
 
 
 

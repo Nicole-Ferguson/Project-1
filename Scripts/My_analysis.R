@@ -419,13 +419,14 @@ names(H)<-c("Area","Canopy_cover","Canopy_height")
 
 df<-rbind(I,H)
 
-theme_set(theme_classic())
+
 gg <- ggplot(df, aes(x=Canopy_cover, y=Canopy_height)) + 
   geom_point(aes(col=Area)) +
-  labs(title="Canopy height vs Canopy cover", 
-       y="Canopy height (m)", 
-       x="Canopy cover (%)",
-       caption="Source:GEDI data")
+  scale_color_manual(values=c("#33CC99","#FF6666"))+
+  labs(y="Canopy height (m)", 
+       x="Canopy cover (%)")+
+  theme_classic()
+plot(gg)
 # main title
 gg + theme(plot.title = element_text(face="bold",size=16))
 
@@ -440,13 +441,13 @@ gg + theme(plot.title = element_text(face="bold",size=16))
 #PAI table
 
 PAI_20_plus<-rbind(Irlanda_PAI_20plus,Hamburgo_PAI_20plus)
-PAI_20_plus<-data.frame(PAI_20_plus,"high_canopy (20+m)")
+PAI_20_plus<-data.frame(PAI_20_plus,"high canopy (20+)")
 PAI_1020<-rbind(Irlanda_PAI_1020,Hamburgo_PAI_1020)
-PAI_1020<-data.frame(PAI_1020,"canopy (10-20m)")
+PAI_1020<-data.frame(PAI_1020,"canopy (10-20)")
 PAI_510<-rbind(Irlanda_PAI_510,Hamburgo_PAI_510)
-PAI_510<-data.frame(PAI_510,"mid (5-10m)")
+PAI_510<-data.frame(PAI_510,"mid height (5-10)")
 PAI_05<-rbind(Irlanda_PAI_05,Hamburgo_PAI_05)
-PAI_05<-data.frame(PAI_05,"understory (0-5m)")
+PAI_05<-data.frame(PAI_05,"understory (0-5)")
 
 total_PAI$Type<-"total"
 names(total_PAI)<-c("Area","PAI","Type")
@@ -456,19 +457,19 @@ names(PAI_1020)<-c("Area","PAI","Type")
 names(PAI_510)<-c("Area","PAI","Type")
 names(PAI_05)<-c("Area","PAI","Type")
 
-PAI.table1<-rbind(PAI_05,PAI_510,PAI_1020,PAI_20_plus, total_PAI)
+PAI.table1<-rbind(PAI_05,PAI_510,PAI_1020,PAI_20_plus)
 
 library(ggthemes)
 g <- ggplot(PAI.table1, aes(x=reorder(Type,-PAI),y=PAI,fill=Area,col=Area))+
   geom_boxplot() +
-  labs(title="PAI vs canopy height",
-       caption="Source: GEDI data",
-       x="Canopy height",
+  scale_fill_manual(values=c("#33CC99","#FF6666"))+
+  scale_color_manual(values=c("#33CC99","#FF6666"))+
+  labs(x="Canopy height (m)",
        y=bquote('PAI'~(m^2/m^2)))+
          coord_flip()+
   theme_classic()
  plot(g)      
-g + theme(plot.title = element_text(face="bold",size=16))
+#g + theme(plot.title = element_text(face="bold",size=16))
 
 
 #Handheld lidar analysis
@@ -602,13 +603,13 @@ mean(Hamburgo_LAI$total.lai)
 Irlanda_LAI<-Irlanda_LAI[,-2]
 total<-data.frame("Irlanda",Irlanda_LAI$total.lai,"Total")
 names(total)<-c("Area","PAI","Type")
-hc<-data.frame("Irlanda",Irlanda_LAI$high.canopy.lai,"High_canopy")
+hc<-data.frame("Irlanda",Irlanda_LAI$high.canopy.lai,"high canopy (20+)")
 names(hc)<-c("Area","PAI","Type")
-c<-data.frame("Irlanda",Irlanda_LAI$canopy.lai,"Canopy")
+c<-data.frame("Irlanda",Irlanda_LAI$canopy.lai,"canopy (10-20)")
 names(c)<-c("Area","PAI","Type")
-m<-data.frame("Irlanda",Irlanda_LAI$mid.lai,"Mid")
+m<-data.frame("Irlanda",Irlanda_LAI$mid.lai,"mid height (5-10)")
 names(m)<-c("Area","PAI","Type")
-u<-data.frame("Irlanda",Irlanda_LAI$understory.lai,"Understory")
+u<-data.frame("Irlanda",Irlanda_LAI$understory.lai,"understory (0-5)")
 names(u)<-c("Area","PAI","Type")
 Irlanda_LAI<-rbind(u,m,c,hc,total)
 
@@ -616,13 +617,13 @@ Irlanda_LAI<-rbind(u,m,c,hc,total)
 Hamburgo_LAI<-Hamburgo_LAI[,-2]
 total<-data.frame("Hamburgo",Hamburgo_LAI$total.lai,"Total")
 names(total)<-c("Area","PAI","Type")
-hc<-data.frame("Hamburgo",Hamburgo_LAI$high.canopy.lai,"High_canopy")
+hc<-data.frame("Hamburgo",Hamburgo_LAI$high.canopy.lai,"high canopy (20+)")
 names(hc)<-c("Area","PAI","Type")
-c<-data.frame("Hamburgo",Hamburgo_LAI$canopy.lai,"Canopy")
+c<-data.frame("Hamburgo",Hamburgo_LAI$canopy.lai,"canopy (10-20)")
 names(c)<-c("Area","PAI","Type")
-m<-data.frame("Hamburgo",Hamburgo_LAI$mid.lai,"Mid")
+m<-data.frame("Hamburgo",Hamburgo_LAI$mid.lai,"mid height (5-10)")
 names(m)<-c("Area","PAI","Type")
-u<-data.frame("Hamburgo",Hamburgo_LAI$understory.lai,"Understory")
+u<-data.frame("Hamburgo",Hamburgo_LAI$understory.lai,"understory (0-5)")
 names(u)<-c("Area","PAI","Type")
 Hamburgo_LAI<-rbind(u,m,c,hc,total)
 
@@ -630,13 +631,13 @@ Hamburgo_LAI<-rbind(u,m,c,hc,total)
 Forest_LAI<-Forest_LAI[,-2]
 total<-data.frame("Forest",Forest_LAI$total.lai,"Total")
 names(total)<-c("Area","PAI","Type")
-hc<-data.frame("Forest",Forest_LAI$high.canopy.lai,"High_canopy")
+hc<-data.frame("Forest",Forest_LAI$high.canopy.lai,"high canopy (20+)")
 names(hc)<-c("Area","PAI","Type")
-c<-data.frame("Forest",Forest_LAI$canopy.lai,"Canopy")
+c<-data.frame("Forest",Forest_LAI$canopy.lai,"canopy (10-20)")
 names(c)<-c("Area","PAI","Type")
-m<-data.frame("Forest",Forest_LAI$mid.lai,"Mid")
+m<-data.frame("Forest",Forest_LAI$mid.lai,"mid height (5-10)")
 names(m)<-c("Area","PAI","Type")
-u<-data.frame("Forest",Forest_LAI$understory.lai,"Understory")
+u<-data.frame("Forest",Forest_LAI$understory.lai,"understory (0-5)")
 names(u)<-c("Area","PAI","Type")
 Forest_LAI<-rbind(u,m,c,hc,total)
 
@@ -652,14 +653,14 @@ All_LAI<-rbind(Irlanda_LAI,Hamburgo_LAI,Forest_LAI)
   library(ggthemes)
 g <- ggplot(All_LAI, aes(x=reorder(Type,-PAI),y=PAI,fill=Area,col=Area))+
   geom_boxplot() +
-  labs(title="PAI vs canopy height",
-       caption="Source: Handheld lidar data",
-       x="Canopy height",
+  scale_fill_manual(values=c("#FF9933","#33CC99","#FF6666"))+
+  scale_color_manual(values=c("#FF9933","#33CC99","#FF6666"))+
+  labs(x="Canopy height (m)",
        y=bquote('PAI'~(m^2/m^2)))+
   coord_flip()+
   theme_classic()
 plot(g)
-g + theme(plot.title = element_text(face="bold",size=16))
+#g + theme(plot.title = element_text(face="bold",size=16))
 
 
 

@@ -22,6 +22,12 @@ pointCounts_irlanda <- pointCounts[pointCounts$Zone == "irlanda",]
 pointCounts_forest <- pointCounts[pointCounts$Zone == "restoration" | pointCounts$Zone == "bosque",]
 pointCounts_hamburgo <- pointCounts[pointCounts$Zone == "hamburgo",]
 
+#nr of point counts per zone without species detection confidence filtering
+PC_irlanda <- unique(pointCounts_irlanda$?..Point_count)
+PC_irlanda<-PC_irlanda[-(23:24)]
+PC_forest <- unique(pointCounts_forest$?..Point_count)
+PC_hamburgo <- unique(pointCounts_hamburgo$?..Point_count)
+
 #Extract latitude and longitude for each zone
 IrlandaLat<-pointCounts_irlanda[,"Lat"]
 IrlandaLon<-pointCounts_irlanda[,"Lon"]
@@ -71,7 +77,9 @@ Forestpolygon_final <- st_sfc(st_polygon(list(st_coordinates(rbind(pts, point5))
 # Get elevation data
 srtm <- terra::rast("Resources/elevation/N15W093.hgt")
 
-pointCounts <- pointCounts[pointCounts$?..Point_count <= 45,]
+srtm2 <- raster(srtm)
+
+pointCounts <- pointCounts[pointCounts$Ã¯..Point_count<= 45,]
 pointCounts_sf <- st_as_sf(pointCounts, coords = c("Lon", "Lat"), crs = crs(srtm))
 
 # Plot polygon on map
@@ -147,12 +155,30 @@ point1 <- st_as_sf(coord1, coords = c("x", "y"), crs = 4326)
 ptsI<-rbind(point2,point3,point10,point14,point18,point17,point16, point15, point1)
 Irlandapolygon_final <- st_sfc(st_polygon(list(st_coordinates(rbind(ptsI, point2)))), crs = 4326)
 
+
+
 # Plot polygon on map
-plot(srtm, xlim=c(-92.36, -92.32), ylim=c(15.15,15.19))
-plot(pointCounts_sf["Zone"],add=TRUE)
-plot(Hamburgopolygon_final, add=TRUE)
-plot(Forestpolygon_final, add=TRUE)
-plot(Irlandapolygon_final, add=TRUE)
+
+pdf(file="map_mexico.pdf", width=15, height=15)
+plot(srtm2, xlim=c(-105, -80), ylim=c(5,25),
+     axes=F)
+dev.off()
+
+
+pdf(file="map_coffeefarms.pdf", width=6, height=6)
+plot(srtm2, xlim=c(-92.36, -92.32), ylim=c(15.15,15.19),
+     axes=F)
+
+plot(Hamburgopolygon_final, add=TRUE, border="green", lwd=3)
+plot(Forestpolygon_final, add=TRUE, border="orange", lwd=3)
+plot(Irlandapolygon_final, add=TRUE, border="red", lwd=3)
+plot(pointCounts_sf["Zone"],add=TRUE,
+    pch = 19, col="black", cex=0.5)
+legend("topright", legend = c("Irlanda", "Hamburgo","Forest"),
+       col = c("red", "green","orange"),lty=1:1,box.lty=0, lwd=3)
+terra::sbar(1, xy=click(), divs=2, cex=1, lwd=1, label=c(0,"km",1))
+
+dev.off()
 
 # Reading GEDI data
 
@@ -211,7 +237,7 @@ Canopy_h_Hamburgo<-Canopy_h_Hamburgo/100
 
 mean(Canopy_h_Irlanda)
 mean(Canopy_h_Hamburgo)
-mean(Canopy_h_Forest)
+#mean(Canopy_h_Forest)
 
 
 Irlanda_height<-data.frame("Irlanda",Canopy_h_Irlanda)
@@ -220,8 +246,8 @@ names(Irlanda_height)<-c("Area","Canopy_height")
 Hamburgo_height<-data.frame("Hamburgo",Canopy_h_Hamburgo)
 names(Hamburgo_height)<-c("Area","Canopy_height")
 
-Forest_height<-data.frame("Forest",Canopy_h_Forest)
-names(Forest_height)<-c("Area","Canopy_height")
+#Forest_height<-data.frame("Forest",Canopy_h_Forest)
+#names(Forest_height)<-c("Area","Canopy_height")
 
 Canopy_h_table<-rbind(Irlanda_height,Hamburgo_height)
 
@@ -251,7 +277,7 @@ Canopy_cov_Hamburgo<-Canopy_cov_Hamburgo*100
 
 mean(Canopy_cov_Irlanda) 
 mean(Canopy_cov_Hamburgo)
-mean(Canopy_cov_Forest)
+#mean(Canopy_cov_Forest)
 
 Irlanda_cover<-data.frame("Irlanda",Canopy_cov_Irlanda)
 names(Irlanda_cover)<-c("Area","Canopy_cover")
@@ -267,11 +293,6 @@ Canopy_cov_table<-rbind(Irlanda_cover,Hamburgo_cover)
 
 
 boxplot(Canopy_cover~Area,data=Canopy_cov_table)
-
-#Canopy cover proxy for comparison with handheld lidar
-Gedi_layers_Irlanda$above3m <- rowSums(Gedi_layers_Irlanda[2:30])
-Gedi_layers_Hamburgo$above3m <- rowSums(Gedi_layers_Hamburgo[2:30])
-
 
 
 
@@ -405,6 +426,11 @@ names(Gedi_FHD_Forest2)<-c("Area","FHD")
 Gedi_FHD<-rbind(Gedi_FHD_Irlanda2,Gedi_FHD_Hamburgo2,Gedi_FHD_Forest2)
 boxplot(FHD~Area,data=Gedi_FHD)
 
+#Canopy cover proxy for comparison with handheld lidar
+Gedi_layers_Irlanda$above3m <- rowSums(Gedi_layers_Irlanda[2:30])
+Gedi_layers_Hamburgo$above3m <- rowSums(Gedi_layers_Hamburgo[2:30])
+
+
 
 #Draw plot of canopy height against canopy cover for each area for GEDI
 
@@ -418,17 +444,17 @@ H<-data.frame("Hamburgo",Canopy_cov_Hamburgo,Canopy_h_Hamburgo)
 names(H)<-c("Area","Canopy_cover","Canopy_height")
 
 df<-rbind(I,H)
-
+write.csv(df,"canopycov_height_GEDI.csv")
 
 gg <- ggplot(df, aes(x=Canopy_cover, y=Canopy_height)) + 
   geom_point(aes(col=Area)) +
   scale_color_manual(values=c("#33CC99","#FF6666"))+
   labs(y="Canopy height (m)", 
        x="Canopy cover (%)")+
-  theme_classic()
+  theme_classic()+
+  theme(text=element_text(size=20))
 plot(gg)
-# main title
-gg + theme(plot.title = element_text(face="bold",size=16))
+
 
 #plot canopy height vs cover for each area for handheld lidar
 
@@ -441,13 +467,13 @@ gg + theme(plot.title = element_text(face="bold",size=16))
 #PAI table
 
 PAI_20_plus<-rbind(Irlanda_PAI_20plus,Hamburgo_PAI_20plus)
-PAI_20_plus<-data.frame(PAI_20_plus,"high canopy (20+)")
+PAI_20_plus<-data.frame(PAI_20_plus,"high canopy \n (20+)")
 PAI_1020<-rbind(Irlanda_PAI_1020,Hamburgo_PAI_1020)
-PAI_1020<-data.frame(PAI_1020,"canopy (10-20)")
+PAI_1020<-data.frame(PAI_1020,"canopy \n (10-20)")
 PAI_510<-rbind(Irlanda_PAI_510,Hamburgo_PAI_510)
-PAI_510<-data.frame(PAI_510,"mid height (5-10)")
+PAI_510<-data.frame(PAI_510,"mid height \n (5-10)")
 PAI_05<-rbind(Irlanda_PAI_05,Hamburgo_PAI_05)
-PAI_05<-data.frame(PAI_05,"understory (0-5)")
+PAI_05<-data.frame(PAI_05,"understory \n (0-5)")
 
 total_PAI$Type<-"total"
 names(total_PAI)<-c("Area","PAI","Type")
@@ -458,6 +484,7 @@ names(PAI_510)<-c("Area","PAI","Type")
 names(PAI_05)<-c("Area","PAI","Type")
 
 PAI.table1<-rbind(PAI_05,PAI_510,PAI_1020,PAI_20_plus)
+write.csv(PAI.table1,"PAI.table1.csv")
 
 library(ggthemes)
 g <- ggplot(PAI.table1, aes(x=reorder(Type,-PAI),y=PAI,fill=Area,col=Area))+
@@ -467,64 +494,84 @@ g <- ggplot(PAI.table1, aes(x=reorder(Type,-PAI),y=PAI,fill=Area,col=Area))+
   labs(x="Canopy height (m)",
        y=bquote('PAI'~(m^2/m^2)))+
          coord_flip()+
-  theme_classic()
+  theme_classic()+
+  theme(text=element_text(size=20))
  plot(g)      
-#g + theme(plot.title = element_text(face="bold",size=16))
 
 
-#Handheld lidar analysis
 
-#PC1
-Point_Count_1_NORM<-readLAS("Resources/PCs/PC1_heightNorm.las")
-Point_Count_1_NORM@data
 
-Points<-dim(Point_Count_1_LAS@data)
-Point_nr<-Points[[1]]
-trajectory<-read.table("PC1/PC1/2022-02-11_00-46-53_traj.txt", sep=" ",header=TRUE)
-length(trajectory$X.time)
-duration<-trajectory[length(trajectory$X.time),1]-trajectory[1,1]
-point_density<-Point_nr/duration 
+ ## Handheld lidar analysis
+ PCs <- list.files("Resources/PCs")
+ library(gtools)
+ PCs<- mixedsort(PCs)
+ 
+ # remove ground points
+ for(i in 1:length(PCs)){
+   Point_count<-readLAS(paste0("Resources/PCs/PC",i,"_heightNorm.las"))
+   Point_count <- Point_count[which(Point_count@data$Classification != 2)]
+   writeLAS(Point_count, paste0("Resources/PCs/PC",i,"_heightNorm_noGround.las"))
+ }
+ 
+ # Canopy height
+ canopy_height_mean90 <- canopy_height_99 <- canopy_height_max <- vector()
+ for(i in 1:length(PCs)){
+   Point_count<-readLAS(paste0("Resources/PCs/PC",i,"_heightNorm_noGround.las"))
+   Z<-Point_count$Z
+   canopy_height_mean90[i] <- mean(subset(Z,Z>quantile(Z,prob=0.9)))
+   canopy_height_99[i] <- quantile(Z,prob=0.99)
+   canopy_height_max[i] <- max(Z)
+ }
+ 
+ # Canopy cover and PAI
+ #subset to points above coffee trees (3+m) and find LAI as cover proxy
+ cc_handheld <- All_HH_LAI <-vector()
+ for(i in 1:length(PCs)){
+   VOXELS_LAD <- lad.voxels(paste0("Resources/PCs/PC",i,"_heightNorm_noGround.las"), grain.size=1)
+   lad_profile <- lad.profile(VOXELS_LAD)
+   lidar.lai <- lai(lad_profile)
+   cc_handheld[i] <- lai(lad_profile, min = 3, max = 150)
+   understory.lai <- lai(lad_profile, min = 0, max = 5)
+   mid.lai<-lai(lad_profile,min=5,max=10)
+   canopy.lai<-lai(lad_profile,min=10,max=20)
+   high.canopy.lai<-lai(lad_profile,min=20,max=150)
+   All_HH_LAI<-rbind(All_HH_LAI, c(understory.lai,mid.lai,canopy.lai,high.canopy.lai)) 
+ }
+ 
+ vegetation_metrics <- as.data.frame(cbind(1:45, canopy_height_mean90, canopy_height_99, canopy_height_max, cc_handheld, All_HH_LAI))
+ colnames(vegetation_metrics) <- c("point_count_ID", "canopy_height_mean90", "canopy_height_99", "canopy_height_max", "canopy_cover", "PAI_understory", "PAI_mid", "PAI_canopy", "PAI_high_canopy")
+ write.csv(vegetation_metrics, "results/vegatation_metrics_PC.csv")
+ 
+
 
 #Canopy height from Handheld lidar
 
-#Z values give height
-Z<-Point_Count_1_NORM$Z
-Z_top<-subset(Z, Z > quantile(Z, prob = 0.9))
-mean(Z_top)# only 6m?
-highest<-max(Point_Count_1_NORM$Z)
 
-#automate for every point count
-PCs <- list.files("Resources/PCs")
-Point_count<-PCs[2] #nr two is nr 10
-library(gtools)
-PCs<- mixedsort(PCs)
-
-
-Height_vector <- vector()
-for(i in 1:length(PCs)){
-  Point_count<-readLAS(paste0("Resources/PCs/",PCs[i]))
-  Z<-Point_count$Z
-  Z_top<-subset(Z,Z>quantile(Z,prob=0.9))
-  Height_vector<-c(Height_vector,mean(Z_top))
-}
+#Height_vector <- vector()
+#for(i in 1:length(PCs)){
+ # Point_count<-readLAS(paste0("Resources/PCs/",PCs[i]))
+#  Z<-Point_count$Z
+ # Z_top<-subset(Z,Z>quantile(Z,prob=0.9))
+#  Height_vector<-c(Height_vector,mean(Z_top))
+#}
 
 #Get maximum height values
-max_vector<-vector()
-for(i in 1:length(PCs)){
-  Point_count<-readLAS(paste0("Resources/PCs/",PCs[i]))
-  Z<-Point_count$Z
-  highest<-max(Z)
-  max_vector<-c(max_vector,highest)
-}
+#max_vector<-vector()
+#for(i in 1:length(PCs)){
+ # Point_count<-readLAS(paste0("Resources/PCs/",PCs[i]))
+#  Z<-Point_count$Z
+#  highest<-max(Z)
+#  max_vector<-c(max_vector,highest)
+#}
 
 #Get height for each area
-Irlanda_height<-Height_vector[PC_irlanda]
-Hamburgo_height<-Height_vector[PC_hamburgo]
-Forest_height<-Height_vector[PC_forest]
+Irlanda_height<-vegetation_metrics$canopy_height_mean90[PC_irlanda]
+Hamburgo_height<-vegetation_metrics$canopy_height_mean90[PC_hamburgo]
+Forest_height<-vegetation_metrics$canopy_height_mean90[PC_forest]
 
-Irlanda_max<-max_vector[PC_irlanda]
-Hamburgo_max<-max_vector[PC_hamburgo]
-Forest_max<-max_vector[PC_forest]
+Irlanda_max<-vegetation_metrics$canopy_height_max[PC_irlanda]
+Hamburgo_max<-vegetation_metrics$canopy_height_max[PC_hamburgo]
+Forest_max<-vegetation_metrics$canopy_height_max[PC_forest]
 
 mean(Irlanda_height,na.rm=TRUE)
 mean(Hamburgo_height,na.rm=TRUE)
@@ -537,19 +584,20 @@ mean(Forest_max)
 #Canopy cover from handheld lidar
 
 #subset to points above coffee trees (3+m) and find LAi as cover proxy
-cc_handheld<-vector()
-for(i in 1:length(PCs)){
-  VOXELS_LAD <- lad.voxels(paste0("Resources/PCs/",PCs[i]), grain.size=1)
-  lad_profile <- lad.profile(VOXELS_LAD)
-  lidar.lai <- lai(lad_profile); lidar.lai
-  cc.lai <- lai(lad_profile, min = 3, max = 150); cc.lai
-  cc_handheld<-c(cc_handheld,cc.lai)
-}
+#cc_handheld<-vector()
+#for(i in 1:length(PCs)){
+#  VOXELS_LAD <- lad.voxels(paste0("Resources/PCs/",PCs[i]), grain.size=1)
+#  lad_profile <- lad.profile(VOXELS_LAD)
+#  lidar.lai <- lai(lad_profile); lidar.lai
+#  cc.lai <- lai(lad_profile, min = 3, max = 150); cc.lai
+#  cc_handheld<-c(cc_handheld,cc.lai)
+#}
 
 #canopy cover per area
-cc_hh_Irlanda<-cc_handheld[PC_irlanda]
-cc_hh_Hamburgo<-cc_handheld[PC_hamburgo]
-cc_hh_Forest<-cc_handheld[PC_forest]
+cc_hh_Irlanda<-vegetation_metrics$canopy_cover[PC_irlanda]
+cc_hh_Hamburgo<-vegetation_metrics$canopy_cover[PC_hamburgo]
+cc_hh_Forest<-vegetation_metrics$canopy_cover[PC_forest]
+write.csv(vegetation_metrics,"vegetation_metrics2.csv")
 
 mean(cc_hh_Irlanda,na.rm=TRUE)
 mean(cc_hh_Hamburgo,na.rm=TRUE)
@@ -558,94 +606,85 @@ mean(cc_hh_Forest)
 
 #PAI from handheld
 
-VOXELS_LAD <- lad.voxels("Resources/PCs/PC1_heightNorm.las",
-                         grain.size = 1)
-
-lad_profile <- lad.profile(VOXELS_LAD)
-
-lidar.lai <- lai(lad_profile); lidar.lai
-understory.lai <- lai(lad_profile, min = 0, max = 5); understory.lai
-mid.lai<-lai(lad_profile,min=5,max=10);mid.lai
-canopy.lai<-lai(lad_profile,min=10,max=20);canopy.lai
-high.canopy.lai<-lai(lad_profile,min=20,max=150);high.canopy.lai
-PC1_LAI<-data.frame("1",understory.lai,mid.lai,canopy.lai,high.canopy.lai)
-
 #automate for every point count
-All_HH_LAI<-vector()
-for(i in 1:length(PCs)){
-  VOXELS_LAD <- lad.voxels(paste0("Resources/PCs/",PCs[i]), grain.size=1)
-  lad_profile <- lad.profile(VOXELS_LAD)
-  lidar.lai <- lai(lad_profile); lidar.lai
-  understory.lai <- lai(lad_profile, min = 0, max = 5); understory.lai
-  mid.lai<-lai(lad_profile,min=5,max=10);mid.lai
-  canopy.lai<-lai(lad_profile,min=10,max=20);canopy.lai
-  high.canopy.lai<-lai(lad_profile,min=20,max=150);high.canopy.lai
-  PC_LAI<-data.frame(i,understory.lai,mid.lai,canopy.lai,high.canopy.lai)
-  All_HH_LAI<-rbind(All_HH_LAI,PC_LAI) 
-}
+#All_HH_LAI<-vector()
+#for(i in 1:length(PCs)){
+ # VOXELS_LAD <- lad.voxels(paste0("Resources/PCs/",PCs[i]), grain.size=1)
+#  lad_profile <- lad.profile(VOXELS_LAD)
+#  lidar.lai <- lai(lad_profile); lidar.lai
+#  understory.lai <- lai(lad_profile, min = 0, max = 5); understory.lai
+#  mid.lai<-lai(lad_profile,min=5,max=10);mid.lai
+#  canopy.lai<-lai(lad_profile,min=10,max=20);canopy.lai
+#  high.canopy.lai<-lai(lad_profile,min=20,max=150);high.canopy.lai
+#  PC_LAI<-data.frame(i,understory.lai,mid.lai,canopy.lai,high.canopy.lai)
+#  All_HH_LAI<-rbind(All_HH_LAI,PC_LAI) 
+#}
 All_HH_LAI$Total<-rowSums(All_HH_LAI[,2:5])
+
+vegetation_metrics$total_PAI<-rowSums(vegetation_metrics[,6:9])
+vegetation_metrics$Area<-"Irlanda"
+vegetation_metrics[31:45,11]<-"Hamburgo"
+vegetation_metrics[19:24,11]<-"Forest"
+
+All_HH_LAI<-vegetation_metrics[,6:11]
+write.csv(All_HH_LAI,"All_HH_LAI.csv")
 
 #sort LAI by location, use unfiltered PC_ vectors!
 # Filter point counts per zone
-Irlanda_LAI<-data.frame("Irlanda",All_HH_LAI[PC_irlanda,])
-names(Irlanda_LAI)<-c("Area","i","understory.lai","mid.lai","canopy.lai","high.canopy.lai","total.lai")
-Hamburgo_LAI<-data.frame("Hamburgo",All_HH_LAI[PC_hamburgo,])
-Hamburgo_LAI<-Hamburgo_LAI[-12,]
-names(Hamburgo_LAI)<-c("Area","i","understory.lai","mid.lai","canopy.lai","high.canopy.lai","total.lai")
-Forest_LAI<-data.frame("Forest",All_HH_LAI[PC_forest,])
-names(Forest_LAI)<-c("Area","i","understory.lai","mid.lai","canopy.lai","high.canopy.lai","total.lai")
+Irlanda_LAI<-data.frame(All_HH_LAI[PC_irlanda,])
+names(Irlanda_LAI)<-c("understory.lai","mid.lai","canopy.lai","high.canopy.lai","total.lai","Area")
+Hamburgo_LAI<-data.frame(All_HH_LAI[PC_hamburgo,])
+names(Hamburgo_LAI)<-c("understory.lai","mid.lai","canopy.lai","high.canopy.lai","total.lai","Area")
+Forest_LAI<-data.frame(All_HH_LAI[PC_forest,])
+names(Forest_LAI)<-c("understory.lai","mid.lai","canopy.lai","high.canopy.lai","total.lai","Area")
 
 #Mean total LAI
 mean(Irlanda_LAI$total.lai)
 mean(Hamburgo_LAI$total.lai)
 
 #Reorder Lai to draw graph
-Irlanda_LAI<-Irlanda_LAI[,-2]
 total<-data.frame("Irlanda",Irlanda_LAI$total.lai,"Total")
 names(total)<-c("Area","PAI","Type")
-hc<-data.frame("Irlanda",Irlanda_LAI$high.canopy.lai,"high canopy (20+)")
+hc<-data.frame("Irlanda",Irlanda_LAI$high.canopy.lai,"high canopy \n (20+)")
 names(hc)<-c("Area","PAI","Type")
-c<-data.frame("Irlanda",Irlanda_LAI$canopy.lai,"canopy (10-20)")
+c<-data.frame("Irlanda",Irlanda_LAI$canopy.lai,"canopy \n (10-20)")
 names(c)<-c("Area","PAI","Type")
-m<-data.frame("Irlanda",Irlanda_LAI$mid.lai,"mid height (5-10)")
+m<-data.frame("Irlanda",Irlanda_LAI$mid.lai,"mid height \n (5-10)")
 names(m)<-c("Area","PAI","Type")
-u<-data.frame("Irlanda",Irlanda_LAI$understory.lai,"understory (0-5)")
+u<-data.frame("Irlanda",Irlanda_LAI$understory.lai,"understory \n (0-5)")
 names(u)<-c("Area","PAI","Type")
 Irlanda_LAI<-rbind(u,m,c,hc,total)
 
 
-Hamburgo_LAI<-Hamburgo_LAI[,-2]
 total<-data.frame("Hamburgo",Hamburgo_LAI$total.lai,"Total")
 names(total)<-c("Area","PAI","Type")
-hc<-data.frame("Hamburgo",Hamburgo_LAI$high.canopy.lai,"high canopy (20+)")
+hc<-data.frame("Hamburgo",Hamburgo_LAI$high.canopy.lai,"high canopy \n (20+)")
 names(hc)<-c("Area","PAI","Type")
-c<-data.frame("Hamburgo",Hamburgo_LAI$canopy.lai,"canopy (10-20)")
+c<-data.frame("Hamburgo",Hamburgo_LAI$canopy.lai,"canopy \n (10-20)")
 names(c)<-c("Area","PAI","Type")
-m<-data.frame("Hamburgo",Hamburgo_LAI$mid.lai,"mid height (5-10)")
+m<-data.frame("Hamburgo",Hamburgo_LAI$mid.lai,"mid height \n (5-10)")
 names(m)<-c("Area","PAI","Type")
-u<-data.frame("Hamburgo",Hamburgo_LAI$understory.lai,"understory (0-5)")
+u<-data.frame("Hamburgo",Hamburgo_LAI$understory.lai,"understory \n (0-5)")
 names(u)<-c("Area","PAI","Type")
 Hamburgo_LAI<-rbind(u,m,c,hc,total)
 
-
-Forest_LAI<-Forest_LAI[,-2]
 total<-data.frame("Forest",Forest_LAI$total.lai,"Total")
 names(total)<-c("Area","PAI","Type")
-hc<-data.frame("Forest",Forest_LAI$high.canopy.lai,"high canopy (20+)")
+hc<-data.frame("Forest",Forest_LAI$high.canopy.lai,"high canopy \n (20+)")
 names(hc)<-c("Area","PAI","Type")
-c<-data.frame("Forest",Forest_LAI$canopy.lai,"canopy (10-20)")
+c<-data.frame("Forest",Forest_LAI$canopy.lai,"canopy \n (10-20)")
 names(c)<-c("Area","PAI","Type")
-m<-data.frame("Forest",Forest_LAI$mid.lai,"mid height (5-10)")
+m<-data.frame("Forest",Forest_LAI$mid.lai,"mid height \n (5-10)")
 names(m)<-c("Area","PAI","Type")
-u<-data.frame("Forest",Forest_LAI$understory.lai,"understory (0-5)")
+u<-data.frame("Forest",Forest_LAI$understory.lai,"understory \n (0-5)")
 names(u)<-c("Area","PAI","Type")
 Forest_LAI<-rbind(u,m,c,hc,total)
 
 
 #for graph without total values
-Hamburgo_LAI<-Hamburgo_LAI[-(45:55),]
+Hamburgo_LAI<-Hamburgo_LAI[-(61:75),]
 Irlanda_LAI<-Irlanda_LAI[-(89:110),]
-Forest_LAI<-Forest_LAI[-(25:30),]
+Forest_LAI<-Forest_LAI[-(33:40),]
 
 #draw boxplot of HH LAI
 All_LAI<-rbind(Irlanda_LAI,Hamburgo_LAI,Forest_LAI)
@@ -658,20 +697,13 @@ g <- ggplot(All_LAI, aes(x=reorder(Type,-PAI),y=PAI,fill=Area,col=Area))+
   labs(x="Canopy height (m)",
        y=bquote('PAI'~(m^2/m^2)))+
   coord_flip()+
-  theme_classic()
+  theme_classic()+
+  theme(text=element_text(size=20))
 plot(g)
-#g + theme(plot.title = element_text(face="bold",size=16))
 
 
-
-#FHD
-lad.voxels(Point_Count_1_NORM, grain.size = 1, k = 1)
 
 #Comparing GEDI vegetation metrics with Handheld metrics
-
-
-
-
 
 
 
@@ -691,10 +723,10 @@ pointCounts_forest <- pointCounts_forest[which(pointCounts_forest$Confidence >= 
 pointCounts_hamburgo <- pointCounts_hamburgo[which(pointCounts_hamburgo$Confidence >= conf_threshold),]
 
 #nr of point counts per zone after confidence filtering(above)
-PC_irlanda <- unique(pointCounts_irlanda$ï..Point_count)
+PC_irlanda <- unique(pointCounts_irlanda$?..Point_count)
 PC_irlanda<-PC_irlanda[-23]
-PC_forest <- unique(pointCounts_forest$ï..Point_count)
-PC_hamburgo <- unique(pointCounts_hamburgo$ï..Point_count)
+PC_forest <- unique(pointCounts_forest$?..Point_count)
+PC_hamburgo <- unique(pointCounts_hamburgo$?..Point_count)
 
 # Species per zone
 species_irlanda <- unique(pointCounts_irlanda$Species)
@@ -704,38 +736,44 @@ species_hamburgo <- unique(pointCounts_hamburgo$Species)
 overall_richness<-c(length(species_irlanda), length(species_hamburgo),length(species_forest))
 names<-c("Irlanda","Hamburgo","Forest")
 overall_richness<-data.frame(names,overall_richness)
-#account for effort by dividing by nr of point counts
-points<-c(length(PC_irlanda),length(PC_hamburgo),length(PC_forest))
-overall_richness$points<-points
-overall_richness$richness_by_effort<-overall_richness$overall_richness/overall_richness$points
+
 
 boxplot(overall_richness~names, data=overall_richness)
 
 
-#richness for each point count 
-
 #try exporting point counts into excel file and getting richness
-write.table(pointCounts_irlanda, file="pointcounts_irlanda.csv", sep=",", row.names = F)
-write.table(pointCounts_hamburgo,file="pointcounts_hamburgo.csv",sep=",",row.names = F)
-write.table(pointCounts_forest,file="pointcounts_forest.csv",sep=",",row.names=F)
+#write.table(pointCounts_irlanda, file="pointcounts_irlanda.csv", sep=",", row.names = F)
+#write.table(pointCounts_hamburgo,file="pointcounts_hamburgo.csv",sep=",",row.names = F)
+#write.table(pointCounts_forest,file="pointcounts_forest.csv",sep=",",row.names=F)
 
-Irlanda_richness<-read.delim("Resources/Irlanda_richness.csv",sep=",")
-Irlanda_richness$Area<-"Irlanda"
-names(Irlanda_richness)<-c("Point_count","Richness","Area")
-Hamburgo_richness<-read.delim("Resources/Hamburgo_richness.csv",sep=",")
-Hamburgo_richness$Area<-"Hamburgo"
-names(Hamburgo_richness)<-c("Point_count","Richness","Area")
-Forest_richness<-read.delim("Resources/Forest_richness.csv",sep=",")
-Forest_richness$Area<-"Forest"
-names(Forest_richness)<-c("Point_count","Richness","Area")
+#Irlanda_richness<-read.delim("Resources/Irlanda_richness.csv",sep=",")
+#Irlanda_richness$Area<-"Irlanda"
+#names(Irlanda_richness)<-c("Point_count","Richness","Audiomoth","Total richness","Area")
+#Hamburgo_richness<-read.delim("Resources/Hamburgo_richness.csv",sep=",")
+#Hamburgo_richness$Area<-"Hamburgo"
+#names(Hamburgo_richness)<-c("Point_count","Richness","Audiomoth","Total richness","Area")
+#Forest_richness<-read.delim("Resources/Forest_richness.csv",sep=",")
+#Forest_richness$Area<-"Forest"
+#names(Forest_richness)<-c("Point_count","Richness","Audiomoth","Total richness","Area")
 
-All_HH_richness<-rbind(Irlanda_richness,Hamburgo_richness,Forest_richness)
+#All_HH_richness<-rbind(Irlanda_richness,Hamburgo_richness,Forest_richness)
 
-boxplot(Richness~Area,data=All_HH_richness)
+#draw boxplot of richness per point count to area
+All_HH_richness$Area <- factor(All_HH_richness$Area,levels=c("Irlanda", "Hamburgo", "Forest"))
+
+g <- ggplot(All_HH_richness, aes(x=Area,y=Richness,fill=Area,col=Area))+
+  geom_boxplot() +
+  scale_fill_manual(values=c("#FF6666","#33CC99","#FF9933"))+
+  scale_color_manual(values=c("black","black","black"))+
+  labs(x="Area",
+       y="Species richness")+
+  theme_classic()
+plot(g)
 
 #adding richness from audiomoth data
 PCs <- list.files("Resources/audiomoths")
 PCs<- mixedsort(PCs)
+PCs<-PCs[-(46:47)]
 audiomoth_detections <- vector()
 for(i in 1:length(PCs)){
   PC_path <- paste0("Resources/audiomoths/", PCs[i])
@@ -892,7 +930,7 @@ names(Forest_richness)<-c("Point_count","Richness","Audiomoth","Overall_richness
 All_HH_richness<-rbind(Irlanda_richness,Hamburgo_richness,Forest_richness)
 
 
-#combine richness, canopy cover, height in a table, then do relationship..?
+#combine richness, canopy cover, height in a table, then do relationship..?#probably incorrect point count numbersss....
 vector<-c(1:45)
 vector<-vector[-37]
 vector<-vector[-38]
@@ -904,7 +942,7 @@ Total_LAI<-data.frame(vector,All_HH_LAI$Total)
 #rearrange richness by point count
 All_HH_richness<-All_HH_richness%>%arrange(Point_count)
 All_HH_richness<-All_HH_richness[-41,]
-richness<-All_HH_richness$Overall_richness
+richness<-All_HH_richness$Total_richness
 vector2<-vector[-26]
 vector2<-vector2[-25]
 vector2<-vector2[-40]
@@ -959,18 +997,6 @@ g+theme(plot.title = element_text(face="bold",size=16))
 m4<-lm(richness_vegindex$richness~richness_vegindex$total_LAI)
 summary(m4)
 
-#richness GLMs
-richness_vegindex$Area<-"Irlanda"
-richness_vegindex$Area[29:40]<-"Hamburgo"
-richness_vegindex$Area[19:24]<-"Forest"
-m<-glm(richness~max_canopy_height+mean_canopy_height+canopy_cover+total_LAI+Area,family=poisson,data=richness_vegindex)
-summary(m)
-
-#richness mixed effects model
-library(lme4)
-
-m2<-lmer(richness~max_canopy_height+mean_canopy_height+canopy_cover+total_LAI+(1|Area), data=richness_vegindex)
-summary(m2)#no effects explained by area???
 
 #Shannon index
 Irlanda_species_table<-read.csv("Resources/Irlanda_species.csv")
@@ -1086,6 +1112,88 @@ legend(
 
 boxplot(bd)
 anova(bd)#areas do not differ significantly in relation to how communities vary from each other
+
+
+species_irlanda_audio
+species_hamburgo_audio
+species_forest_audio
+
+
+## Beta diversity ##
+
+# load species names and acronyms
+spp_names<-read.csv("Resources/species_names_acronyms.csv")
+species_forest_common_name <- spp_names$Ã¯..Species.name[match(species_forest, spp_names$acronym)]
+species_forest_total <- unique(c(species_forest_common_name, species_forest_audio))
+
+species_irlanda_common_name <- spp_names$Ã¯..Species.name[match(species_irlanda, spp_names$acronym)]
+species_irlanda_total <- unique(c(species_irlanda_common_name, species_irlanda_audio))
+species_irlanda_total <- species_irlanda_total[-which(is.na(species_irlanda_total))]
+
+species_hamburgo_common_name <- spp_names$Ã¯..Species.name[match(species_hamburgo, spp_names$acronym)]
+species_hamburgo_total <- unique(c(species_hamburgo_common_name, species_hamburgo_audio))
+
+
+# create a presence-absence community matrix
+
+species_total <- unique(c(species_forest_total, species_irlanda_total, species_hamburgo_total))
+
+comm.mat <- rbind(species_total %in% species_forest_total,
+                  species_total %in% species_irlanda_total,
+                  species_total %in% species_hamburgo_total)
+row.names(comm.mat) <- c("forest", "irlanda", "hamburgo")
+colnames(comm.mat) <- species_total
+comm.mat[which(comm.mat == TRUE)] <- 1
+comm.mat[which(comm.mat == FALSE)] <- 0
+
+dist <- beta.pair(comm.mat, index.family="jaccard")
+
+
+
+
+
+## Beta diversity at point count level ##
+
+# create a presence-absence community matrix
+
+comm.mat <- vector()
+species.richness <- vector()
+for(i in 1:45){
+  species_total_PC <- unique(c(spp_names$Species.name[match(pointCounts$Species[which(pointCounts$Point_count == i)], spp_names$acronym)],
+                               audiomoth_detections_filtered$Common.name[audiomoth_detections_filtered$point_count == i]))
+  comm.mat <- rbind(comm.mat, species_total %in% species_total_PC)
+  species.richness[i] <- length(species_total_PC)
+}
+row.names(comm.mat) <- 1:45
+colnames(comm.mat) <- species_total
+comm.mat[which(comm.mat == TRUE)] <- 1
+comm.mat[which(comm.mat == FALSE)] <- 0
+
+species.richness <- species.richness[-(46:47)]
+
+dist.jaccard <- beta.pair(comm.mat, index.family="jaccard")
+
+groups <- rep(NA,45)
+groups[PC_forest] <- "forest"
+groups[PC_irlanda] <- "irlanda"
+groups[PC_hamburgo] <- "hamburgo"
+groups <- groups[-(46:47)]
+
+
+bd = betadisper(dist.jaccard[[3]], groups)
+plot(bd)
+boxplot(bd)
+anova(bd)
+
+
+## Comparing species richness between zones
+t.test(species.richness.irlanda,species.richness.hamburgo)#0.045
+t.test(species.richness.irlanda,species.richness.forest)#insignificant
+t.test(species.richness.hamburgo,species.richness.forest)#insignificant
+
+#t.test(species.richness[species.richness[PC_irlanda[1:(length(PC_irlanda)-2)]]], species.richness[PC_hamburgo])
+#t.test(species.richness[PC_forest], species.richness[PC_hamburgo])
+#t.test(species.richness[PC_forest], species.richness[species.richness[PC_irlanda[1:(length(PC_irlanda)-2)]]])
 
 
 #plot our visual estimates and compare to real values

@@ -226,7 +226,7 @@ boxplot(Total_LAI$PAI~Total_LAI$Area)
 boxplot(residuals(a_hh4)~Total_LAI$Area)
 
 
-Understory_LAI<-All_LAI[which(All_LAI$Type=="understory (0-5)"),]
+Understory_LAI<-All_LAI[which(All_LAI$Type=="understory \n (0-5)"),]
 
 a_hh5<-aov(Understory_LAI$PAI~Understory_LAI$Area)
 summary(a_hh5)
@@ -241,7 +241,7 @@ boxplot(Understory_LAI$PAI~Understory_LAI$Area)
 boxplot(residuals(a_hh5)~Understory_LAI$Area)
 
 
-Mid_LAI<-All_LAI[which(All_LAI$Type=="mid height (5-10)"),]
+Mid_LAI<-All_LAI[which(All_LAI$Type=="mid height \n (5-10)"),]
 
 a_hh6<-aov(Mid_LAI$PAI~Mid_LAI$Area)
 summary(a_hh6)
@@ -256,7 +256,7 @@ boxplot(Mid_LAI$PAI~Mid_LAI$Area)
 boxplot(residuals(a_hh6)~Mid_LAI$Area)
 
 
-Canopy_LAI<-All_LAI[which(All_LAI$Type=="canopy (10-20)"),]
+Canopy_LAI<-All_LAI[which(All_LAI$Type=="canopy \n (10-20)"),]
 
 a_hh7<-aov(Canopy_LAI$PAI~Canopy_LAI$Area)
 summary(a_hh7)
@@ -276,7 +276,7 @@ a_hh7<-aov(Canopy_LAI$Log~Canopy_LAI$Area)
 summary(a_hh7)
 
 
-High_canopy_LAI<-All_LAI[which(All_LAI$Type=="high canopy (20+)"),]
+High_canopy_LAI<-All_LAI[which(All_LAI$Type=="high canopy \n (20+)"),]
 
 a_hh8<-aov(High_canopy_LAI$PAI~High_canopy_LAI$Area)
 summary(a_hh8)

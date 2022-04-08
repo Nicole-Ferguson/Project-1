@@ -159,22 +159,17 @@ Irlandapolygon_final <- st_sfc(st_polygon(list(st_coordinates(rbind(ptsI, point2
 
 # Plot polygon on map
 
-pdf(file="map_mexico.pdf", width=15, height=15)
-plot(srtm2, xlim=c(-105, -80), ylim=c(5,25),
-     axes=F)
-dev.off()
-
 
 pdf(file="map_coffeefarms.pdf", width=6, height=6)
 plot(srtm2, xlim=c(-92.36, -92.32), ylim=c(15.15,15.19),
-     axes=F)
+     axes=F, col=colorRampPalette(c("green", "yellow", "brown4"))(100))
 
 plot(Hamburgopolygon_final, add=TRUE, border="green", lwd=3)
 plot(Forestpolygon_final, add=TRUE, border="orange", lwd=3)
 plot(Irlandapolygon_final, add=TRUE, border="red", lwd=3)
 plot(pointCounts_sf["Zone"],add=TRUE,
     pch = 19, col="black", cex=0.5)
-legend("topright", legend = c("Irlanda", "Hamburgo","Forest"),
+legend("topleft", legend = c("Irlanda", "Hamburgo","Forest"),
        col = c("red", "green","orange"),lty=1:1,box.lty=0, lwd=3)
 terra::sbar(1, xy=click(), divs=2, cex=1, lwd=1, label=c(0,"km",1))
 
@@ -1113,10 +1108,6 @@ legend(
 boxplot(bd)
 anova(bd)#areas do not differ significantly in relation to how communities vary from each other
 
-
-species_irlanda_audio
-species_hamburgo_audio
-species_forest_audio
 
 
 ## Beta diversity ##

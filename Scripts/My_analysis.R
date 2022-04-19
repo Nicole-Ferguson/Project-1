@@ -17,16 +17,16 @@ library(rgdal)
 #creating matrix of longitude and latitude of occurrences for each place
 
 # Filter point counts per zone
-pointCounts <- read.csv("resources/Point_counts.csv")
+pointCounts <- read.csv("Resources/Point_counts.csv")
 pointCounts_irlanda <- pointCounts[pointCounts$Zone == "irlanda",]
 pointCounts_forest <- pointCounts[pointCounts$Zone == "restoration" | pointCounts$Zone == "bosque",]
 pointCounts_hamburgo <- pointCounts[pointCounts$Zone == "hamburgo",]
 
 #nr of point counts per zone without species detection confidence filtering
-PC_irlanda <- unique(pointCounts_irlanda$?..Point_count)
+PC_irlanda <- unique(pointCounts_irlanda$ï..Point_count)
 PC_irlanda<-PC_irlanda[-(23:24)]
-PC_forest <- unique(pointCounts_forest$?..Point_count)
-PC_hamburgo <- unique(pointCounts_hamburgo$?..Point_count)
+PC_forest <- unique(pointCounts_forest$ï..Point_count)
+PC_hamburgo <- unique(pointCounts_hamburgo$ï..Point_count)
 
 #Extract latitude and longitude for each zone
 IrlandaLat<-pointCounts_irlanda[,"Lat"]
@@ -226,12 +226,14 @@ toremove<-which(Canopy_h_Hamburgo==0)
 Canopy_h_Hamburgo<-Canopy_h_Hamburgo[-toremove]
 Canopy_h_Hamburgo<-Canopy_h_Hamburgo/100
 
-#Forest_metrics<-gedi_irlanda2[Forest_gedi[[1]], ]
+Forest_metrics<-gedi_irlanda2[Forest_gedi[[1]], ]
 #Canopy_h_Forest<-Forest_metrics$rh100
 
 
 mean(Canopy_h_Irlanda)
+sd(Canopy_h_Irlanda)
 mean(Canopy_h_Hamburgo)
+sd(Canopy_h_Hamburgo)
 #mean(Canopy_h_Forest)
 
 
@@ -271,7 +273,9 @@ Canopy_cov_Hamburgo<-Canopy_cov_Hamburgo*100
 
 
 mean(Canopy_cov_Irlanda) 
+sd(Canopy_cov_Irlanda)
 mean(Canopy_cov_Hamburgo)
+sd(Canopy_cov_Hamburgo)
 #mean(Canopy_cov_Forest)
 
 Irlanda_cover<-data.frame("Irlanda",Canopy_cov_Irlanda)
@@ -397,7 +401,9 @@ boxplot(High_canopy_PAI~Area,data=High_canopy_PAI)
 
 
 mean(Gedi_layers_Irlanda$total)
+sd(Gedi_layers_Irlanda$total)
 mean(Gedi_layers_Hamburgo$total)
+sd(Gedi_layers_Hamburgo$total)
 
 #Get FHD values for each area
 all_FHD<-gedi_irlanda$fhd_normal
@@ -449,11 +455,6 @@ gg <- ggplot(df, aes(x=Canopy_cover, y=Canopy_height)) +
   theme_classic()+
   theme(text=element_text(size=20))
 plot(gg)
-
-
-#plot canopy height vs cover for each area for handheld lidar
-
-
 
 
 
@@ -569,11 +570,15 @@ Hamburgo_max<-vegetation_metrics$canopy_height_max[PC_hamburgo]
 Forest_max<-vegetation_metrics$canopy_height_max[PC_forest]
 
 mean(Irlanda_height,na.rm=TRUE)
+sd(Irlanda_height)
 mean(Hamburgo_height,na.rm=TRUE)
+sd(Hamburgo_height)
 mean(Forest_height)
 
 mean(Irlanda_max,na.rm=TRUE)
+sd(Irlanda_max)
 mean(Hamburgo_max,na.rm=TRUE)
+sd(Hamburgo_max)
 mean(Forest_max)
 
 #Canopy cover from handheld lidar
@@ -595,7 +600,9 @@ cc_hh_Forest<-vegetation_metrics$canopy_cover[PC_forest]
 write.csv(vegetation_metrics,"vegetation_metrics2.csv")
 
 mean(cc_hh_Irlanda,na.rm=TRUE)
+sd(cc_hh_Irlanda)
 mean(cc_hh_Hamburgo,na.rm=TRUE)
+sd(cc_hh_Hamburgo)
 mean(cc_hh_Forest)
 
 
@@ -614,7 +621,7 @@ mean(cc_hh_Forest)
 #  PC_LAI<-data.frame(i,understory.lai,mid.lai,canopy.lai,high.canopy.lai)
 #  All_HH_LAI<-rbind(All_HH_LAI,PC_LAI) 
 #}
-All_HH_LAI$Total<-rowSums(All_HH_LAI[,2:5])
+#All_HH_LAI$Total<-rowSums(All_HH_LAI[,2:5])
 
 vegetation_metrics$total_PAI<-rowSums(vegetation_metrics[,6:9])
 vegetation_metrics$Area<-"Irlanda"
@@ -635,7 +642,9 @@ names(Forest_LAI)<-c("understory.lai","mid.lai","canopy.lai","high.canopy.lai","
 
 #Mean total LAI
 mean(Irlanda_LAI$total.lai)
+sd(Irlanda_LAI$total.lai)
 mean(Hamburgo_LAI$total.lai)
+sd(Hamburgo_LAI$total.lai)
 
 #Reorder Lai to draw graph
 total<-data.frame("Irlanda",Irlanda_LAI$total.lai,"Total")
@@ -698,11 +707,6 @@ plot(g)
 
 
 
-#Comparing GEDI vegetation metrics with Handheld metrics
-
-
-
-
 #Species richness
 
 # Filter point counts per zone-remember to filter confidence
@@ -718,10 +722,10 @@ pointCounts_forest <- pointCounts_forest[which(pointCounts_forest$Confidence >= 
 pointCounts_hamburgo <- pointCounts_hamburgo[which(pointCounts_hamburgo$Confidence >= conf_threshold),]
 
 #nr of point counts per zone after confidence filtering(above)
-PC_irlanda <- unique(pointCounts_irlanda$?..Point_count)
+PC_irlanda <- unique(pointCounts_irlanda$ï..Point_count)
 PC_irlanda<-PC_irlanda[-23]
-PC_forest <- unique(pointCounts_forest$?..Point_count)
-PC_hamburgo <- unique(pointCounts_hamburgo$?..Point_count)
+PC_forest <- unique(pointCounts_forest$ï..Point_count)
+PC_hamburgo <- unique(pointCounts_hamburgo$ï..Point_count)
 
 # Species per zone
 species_irlanda <- unique(pointCounts_irlanda$Species)
@@ -735,23 +739,14 @@ overall_richness<-data.frame(names,overall_richness)
 
 boxplot(overall_richness~names, data=overall_richness)
 
-
-#try exporting point counts into excel file and getting richness
-#write.table(pointCounts_irlanda, file="pointcounts_irlanda.csv", sep=",", row.names = F)
-#write.table(pointCounts_hamburgo,file="pointcounts_hamburgo.csv",sep=",",row.names = F)
-#write.table(pointCounts_forest,file="pointcounts_forest.csv",sep=",",row.names=F)
-
-#Irlanda_richness<-read.delim("Resources/Irlanda_richness.csv",sep=",")
-#Irlanda_richness$Area<-"Irlanda"
-#names(Irlanda_richness)<-c("Point_count","Richness","Audiomoth","Total richness","Area")
-#Hamburgo_richness<-read.delim("Resources/Hamburgo_richness.csv",sep=",")
-#Hamburgo_richness$Area<-"Hamburgo"
-#names(Hamburgo_richness)<-c("Point_count","Richness","Audiomoth","Total richness","Area")
-#Forest_richness<-read.delim("Resources/Forest_richness.csv",sep=",")
-#Forest_richness$Area<-"Forest"
-#names(Forest_richness)<-c("Point_count","Richness","Audiomoth","Total richness","Area")
-
-#All_HH_richness<-rbind(Irlanda_richness,Hamburgo_richness,Forest_richness)
+#read in combined richness table
+Irlanda_richness<-read.delim("Resources/Irlanda_richness.csv",sep=",")
+names(Irlanda_richness)<-c("Point_count","Richness","Audiomoth","Overall_richness","Area")
+Hamburgo_richness<-read.delim("Resources/Hamburgo_richness.csv",sep=",")
+names(Hamburgo_richness)<-c("Point_count","Richness","Audiomoth","Overall_richness","Area")
+Forest_richness<-read.delim("Resources/Forest_richness.csv",sep=",")
+names(Forest_richness)<-c("Point_count","Richness","Audiomoth","Overall_richness","Area")
+All_HH_richness<-rbind(Irlanda_richness,Hamburgo_richness,Forest_richness)
 
 #draw boxplot of richness per point count to area
 All_HH_richness$Area <- factor(All_HH_richness$Area,levels=c("Irlanda", "Hamburgo", "Forest"))
@@ -764,165 +759,6 @@ g <- ggplot(All_HH_richness, aes(x=Area,y=Richness,fill=Area,col=Area))+
        y="Species richness")+
   theme_classic()
 plot(g)
-
-#adding richness from audiomoth data
-PCs <- list.files("Resources/audiomoths")
-PCs<- mixedsort(PCs)
-PCs<-PCs[-(46:47)]
-audiomoth_detections <- vector()
-for(i in 1:length(PCs)){
-  PC_path <- paste0("Resources/audiomoths/", PCs[i])
-  audiomoth_det <- vector()
-  for(j in 1:length(list.files(PC_path))){
-    f = read.csv(paste(PC_path, list.files(PC_path)[j], sep="/"), sep=";")
-    audiomoth_det <- rbind(audiomoth_det, f)
-  }
-  audiomoth_det <- cbind(rep(as.numeric(substr(PCs[i], 3, nchar(PCs[i]))), dim(audiomoth_det)[1]), audiomoth_det)
-  audiomoth_detections <- rbind(audiomoth_detections, audiomoth_det)
-}
-colnames(audiomoth_detections)[1] <- "point_count"
-
-write.csv(audiomoth_detections, "results/audiomoth_detections.csv")
-
-## Filter detections per zone
-#audiomoth_detections_filtered_irlanda <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count %in% PC_irlanda,]
-#audiomoth_detections_filtered_forest <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count %in% PC_forest,]
-#audiomoth_detections_filtered_hamburgo <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count %in% PC_hamburgo,]
-
-# Filter the results of BirdNET detection above a threshold for the confidence value
-
-confidence_threshold = 0.75
-audiomoth_detections_filtered <- audiomoth_detections[which(audiomoth_detections$Confidence >= confidence_threshold),]
-
-#Filter detections per point count
-audiomoth_detections_filtered_1 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==1,]
-unique(audiomoth_detections_filtered_1$Common.name)
-
-audiomoth_detections_filtered_2 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==2,]
-unique(audiomoth_detections_filtered_2$Common.name)
-
-audiomoth_detections_filtered_3 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==3,]
-unique(audiomoth_detections_filtered_3$Common.name)
-
-audiomoth_detections_filtered_4 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==4,]
-unique(audiomoth_detections_filtered_4$Common.name)
-
-audiomoth_detections_filtered_5 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==5,]
-unique(audiomoth_detections_filtered_5$Common.name)
-
-audiomoth_detections_filtered_6 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==6,]
-unique(audiomoth_detections_filtered_6$Common.name)
-
-audiomoth_detections_filtered_7 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==7,]
-unique(audiomoth_detections_filtered_7$Common.name)
-
-audiomoth_detections_filtered_8 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==8,]
-unique(audiomoth_detections_filtered_8$Common.name)
-
-audiomoth_detections_filtered_9 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==9,]
-unique(audiomoth_detections_filtered_9$Common.name)
-
-audiomoth_detections_filtered_10 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==10,]
-unique(audiomoth_detections_filtered_10$Common.name)
-
-audiomoth_detections_filtered_11 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==11,]
-unique(audiomoth_detections_filtered_11$Common.name)
-
-audiomoth_detections_filtered_12 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==12,]
-unique(audiomoth_detections_filtered_12$Common.name)
-
-audiomoth_detections_filtered_13 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==13,]
-unique(audiomoth_detections_filtered_13$Common.name)
-
-audiomoth_detections_filtered_14 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==14,]
-unique(audiomoth_detections_filtered_14$Common.name)
-
-audiomoth_detections_filtered_15 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==15,]
-unique(audiomoth_detections_filtered_15$Common.name)
-
-audiomoth_detections_filtered_16 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==16,]
-unique(audiomoth_detections_filtered_16$Common.name)
-
-audiomoth_detections_filtered_17 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==17,]
-unique(audiomoth_detections_filtered_17$Common.name)
-
-audiomoth_detections_filtered_18 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==18,]
-unique(audiomoth_detections_filtered_18$Common.name)
-
-audiomoth_detections_filtered_27 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==27,]
-unique(audiomoth_detections_filtered_27$Common.name)
-
-audiomoth_detections_filtered_28 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==28,]
-unique(audiomoth_detections_filtered_28$Common.name)
-
-audiomoth_detections_filtered_29 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==29,]
-unique(audiomoth_detections_filtered_29$Common.name)
-
-audiomoth_detections_filtered_30 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==30,]
-unique(audiomoth_detections_filtered_30$Common.name)
-
-audiomoth_detections_filtered_31 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==31,]
-unique(audiomoth_detections_filtered_31$Common.name)
-
-audiomoth_detections_filtered_32 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==32,]
-unique(audiomoth_detections_filtered_32$Common.name)
-
-audiomoth_detections_filtered_33 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==33,]
-unique(audiomoth_detections_filtered_33$Common.name)
-
-audiomoth_detections_filtered_34 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==34,]
-unique(audiomoth_detections_filtered_34$Common.name)
-
-audiomoth_detections_filtered_35 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==35,]
-unique(audiomoth_detections_filtered_35$Common.name)
-
-audiomoth_detections_filtered_36 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==36,]
-unique(audiomoth_detections_filtered_36$Common.name)
-
-audiomoth_detections_filtered_38 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==38,]
-unique(audiomoth_detections_filtered_38$Common.name)
-
-audiomoth_detections_filtered_40 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==40,]
-unique(audiomoth_detections_filtered_40$Common.name)
-
-audiomoth_detections_filtered_41 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==41,]
-unique(audiomoth_detections_filtered_41$Common.name)
-
-audiomoth_detections_filtered_42 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==42,]
-unique(audiomoth_detections_filtered_42$Common.name)
-
-audiomoth_detections_filtered_43 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==43,]
-unique(audiomoth_detections_filtered_43$Common.name)
-
-audiomoth_detections_filtered_45 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==45,]
-unique(audiomoth_detections_filtered_45$Common.name)
-
-audiomoth_detections_filtered_19 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==19,]
-unique(audiomoth_detections_filtered_19$Common.name)
-
-audiomoth_detections_filtered_20 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==20,]
-unique(audiomoth_detections_filtered_20$Common.name)
-
-audiomoth_detections_filtered_21 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==21,]
-unique(audiomoth_detections_filtered_21$Common.name)
-
-audiomoth_detections_filtered_22 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==22,]
-unique(audiomoth_detections_filtered_22$Common.name)
-
-audiomoth_detections_filtered_23 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==23,]
-unique(audiomoth_detections_filtered_23$Common.name)
-
-audiomoth_detections_filtered_24 <- audiomoth_detections_filtered[audiomoth_detections_filtered$point_count==24,]
-unique(audiomoth_detections_filtered_24$Common.name)
-
-#read in combined richness table
-Irlanda_richness<-read.delim("Resources/Irlanda_richness.csv",sep=",")
-names(Irlanda_richness)<-c("Point_count","Richness","Audiomoth","Overall_richness","Area")
-Hamburgo_richness<-read.delim("Resources/Hamburgo_richness.csv",sep=",")
-names(Hamburgo_richness)<-c("Point_count","Richness","Audiomoth","Overall_richness","Area")
-Forest_richness<-read.delim("Resources/Forest_richness.csv",sep=",")
-names(Forest_richness)<-c("Point_count","Richness","Audiomoth","Overall_richness","Area")
-All_HH_richness<-rbind(Irlanda_richness,Hamburgo_richness,Forest_richness)
 
 
 #combine richness, canopy cover, height in a table, then do relationship..?#probably incorrect point count numbersss....
@@ -1138,10 +974,6 @@ comm.mat[which(comm.mat == TRUE)] <- 1
 comm.mat[which(comm.mat == FALSE)] <- 0
 
 dist <- beta.pair(comm.mat, index.family="jaccard")
-
-
-
-
 
 ## Beta diversity at point count level ##
 

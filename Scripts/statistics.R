@@ -303,7 +303,7 @@ summary(a_hh8)
 #GEDI height vs max_height
 
 #Irlanda
-#laast Irlanda_max is NA
+#last Irlanda_max is NA
 Irlanda_max<-Irlanda_max[-23]
 #Canopy_h_Irlanda has too many points:remove two last ones
 Canopy_h_Irlanda2<-Canopy_h_Irlanda[-(23:24)]
@@ -312,6 +312,8 @@ Canopy_h_Irlanda2<-Canopy_h_Irlanda[-(23:24)]
 h1<-data.frame(Canopy_h_Irlanda2,Irlanda_max)
 gh1<-aov(h1$Canopy_h_Irlanda2~h1$Irlanda_max)
 summary(gh1)
+
+t.test(Canopy_h_Irlanda,Irlanda_max)
 #normal distributiion of residuals
 qqnorm(residuals(gh1))
 qqline(residuals(gh1))
@@ -335,6 +337,8 @@ Hamburgo_max2<-Hamburgo_max[-(11:12)]
 h2<-data.frame(Canopy_h_Hamburgo,Hamburgo_max2)
 gh2<-aov(h2$Canopy_h_Hamburgo~h2$Hamburgo_max)
 summary(gh2)
+
+t.test(Canopy_h_Hamburgo,Hamburgo_max)
 #normal distributiion of residuals
 qqnorm(residuals(gh2))
 qqline(residuals(gh2))
@@ -355,6 +359,7 @@ h3<-data.frame(Canopy_h_Irlanda2,Irlanda_height)
 gh3<-aov(h3$Canopy_h_Irlanda2~h3$Irlanda_height)
 summary(gh3)
 
+t.test(Canopy_h_Irlanda,Irlanda_height)
 #normal distributiion of residuals
 qqnorm(residuals(gh3))
 qqline(residuals(gh3))

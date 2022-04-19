@@ -38,7 +38,7 @@ write.csv(audiomoth_detections, "results/audiomoth_detections.csv")
 
 
 # Filter the results of BirdNET detection above a threshold for the confidence value
-audiomoth_detections <- read.csv("results/audiomoth_detections.csv",)[,-1]
+audiomoth_detections <- read.csv("Results/audiomoth_detections.csv",)[,-1]
 confidence_threshold = 0.75
 audiomoth_detections_filtered <- audiomoth_detections[which(audiomoth_detections$Confidence >= confidence_threshold),]
 
@@ -205,7 +205,7 @@ m4<-lm(richness_vegindex$richness~richness_vegindex$total_LAI)
 summary(m4)
 
 
-#Beta diversity GLM
+#Beta diversity LM
 height_max_diff<-as.numeric(dist(richness_veg_index2$canopy_height_max))
 canopy_cover_diff<-as.numeric(dist(richness_veg_index2$canopy_cover))
 understory_PAI_diff<-as.numeric(dist(richness_veg_index2$PAI_understory))
@@ -213,12 +213,65 @@ mid_PAI_diff<-as.numeric(dist(richness_veg_index2$PAI_mid))
 canopy_Pai_diff<-as.numeric(dist(richness_veg_index2$PAI_canopy))
 high_canopy_PAi_diff<-as.numeric(dist(richness_veg_index2$PAI_high_canopy))
 
+pointCounts$Lat
+
+
 beta<-as.numeric(dist.jaccard$beta.jac)
 beta_veg<-data.frame(beta,height_max_diff,canopy_cover_diff,understory_PAI_diff,mid_PAI_diff,canopy_Pai_diff,high_canopy_PAi_diff)
 #how to know which ones relate to which ones?? or which area they belong to??
 
-n<-glm(beta~height_max_diff+canopy_cover_diff+understory_PAI_diff+mid_PAI_diff+canopy_Pai_diff+high_canopy_PAi_diff+Area,family=poisson,data=beta_veg)
+n<-lm(beta~height_max_diff+canopy_cover_diff+understory_PAI_diff+mid_PAI_diff+canopy_Pai_diff+high_canopy_PAi_diff,data=beta_veg)
 summary(n)
+#model selection
+n2<-lm(beta~height_max_diff+canopy_cover_diff+understory_PAI_diff+mid_PAI_diff+canopy_Pai_diff,data=beta_veg)
+n3<-lm(beta~height_max_diff+canopy_cover_diff+understory_PAI_diff+mid_PAI_diff+high_canopy_PAi_diff,data=beta_veg)
+n4<-lm(beta~height_max_diff+canopy_cover_diff+understory_PAI_diff+canopy_Pai_diff+high_canopy_PAi_diff,data=beta_veg)
+n5<-lm(beta~height_max_diff+canopy_cover_diff+mid_PAI_diff+canopy_Pai_diff+high_canopy_PAi_diff,data=beta_veg)
+n6<-lm(beta~height_max_diff+understory_PAI_diff+mid_PAI_diff+canopy_Pai_diff+high_canopy_PAi_diff,data=beta_veg)
+n7<-lm(beta~canopy_cover_diff+understory_PAI_diff+mid_PAI_diff+canopy_Pai_diff+high_canopy_PAi_diff,data=beta_veg)
+
+#test each pair 
+anova(n,n2,test="Chi")
+anova(n,n3,test="Chi")
+anova(n,n4,test="Chi")
+anova(n,n5,test="Chi")
+anova(n,n6,test="Chi")
+anova(n,n7,test="Chi")
+
+#second round of selection on n4
+n2<-lm(beta~height_max_diff+canopy_cover_diff+understory_PAI_diff+canopy_Pai_diff,data=beta_veg)
+n3<-lm(beta~height_max_diff+canopy_cover_diff+understory_PAI_diff+high_canopy_PAi_diff,data=beta_veg)
+n41<-lm(beta~height_max_diff+canopy_cover_diff+canopy_Pai_diff+high_canopy_PAi_diff,data=beta_veg)
+n5<-lm(beta~height_max_diff+understory_PAI_diff+canopy_Pai_diff+high_canopy_PAi_diff,data=beta_veg)
+n6<-lm(beta~canopy_cover_diff+understory_PAI_diff+canopy_Pai_diff+high_canopy_PAi_diff,data=beta_veg)
+  
+anova(n4,n2,test="Chi")
+anova(n4,n3,test="Chi")
+anova(n4,n41,test="Chi")
+anova(n4,n5,test="Chi")
+anova(n4,n6,test="Chi")
+
+#second round of selection on n6
+n2<-lm(beta~canopy_cover_diff+understory_PAI_diff+canopy_Pai_diff,data=beta_veg)
+n3<-lm(beta~canopy_cover_diff+understory_PAI_diff+high_canopy_PAi_diff,data=beta_veg)
+n4<-lm(beta~canopy_cover_diff+canopy_Pai_diff+high_canopy_PAi_diff,data=beta_veg)
+n5<-lm(beta~understory_PAI_diff+canopy_Pai_diff+high_canopy_PAi_diff,data=beta_veg)
+
+anova(n6,n2,test="Chi")
+anova(n6,n3,test="Chi")
+anova(n6,n4,test="Chi")
+anova(n6,n5,test="Chi")
+
+#third round of selection on n3
+n2<-lm(beta~canopy_cover_diff+understory_PAI_diff,data=beta_veg)
+n31<-lm(beta~canopy_cover_diff+high_canopy_PAi_diff,data=beta_veg)
+n4<-lm(beta~understory_PAI_diff+high_canopy_PAi_diff,data=beta_veg)
+
+anova(n3,n2,test="Chi")
+anova(n3,n31,test="Chi")
+anova(n3,n4,test="Chi")
+
+#n3 with canopy cover, understory PAI and high canopy PAI is significant
 
 Total_PAI_diff<-as.numeric(dist(richness_veg_index2$total_PAI))
 beta_veg<-data.frame(beta_veg,Total_PAI_diff)
